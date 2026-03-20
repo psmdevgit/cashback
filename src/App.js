@@ -5,7 +5,9 @@ import Login from "./components/Login";
 import Entry from "./pages/Entry";
 import SuspenseEntry from "./pages/SuspenseEntry";
 import InventoryDashboard from "./pages/InventoryDashboard";
+
 import DailyTransaction from "./pages/DailyTransaction";
+
 import MainLayout from "./components/MainLayout";
 
 function App() {
@@ -35,7 +37,9 @@ function App() {
           }
         >
           <Route path="inventory" element={<InventoryDashboard />} />
+
           <Route path="dailyTransaction" element={<DailyTransaction/>} />
+
           <Route path="entry" element={<Entry />} />
           <Route path="suspense" element={<SuspenseEntry />} />
         </Route>

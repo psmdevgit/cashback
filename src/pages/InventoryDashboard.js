@@ -12,6 +12,7 @@ const InventoryDashboard = () => {
     credit: 0
   });
 
+
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   // 🔥 Load Data
@@ -78,6 +79,34 @@ const InventoryDashboard = () => {
   }
 };
 
+  // 🔥 Load Data
+  useEffect(() => {
+    loadData();
+  }, [branch]);
+
+  const loadData = async () => {
+    try {
+      const res = await API.get(`/inventory/${branch}`);
+      setData(res.data);
+
+      if (res.data.length > 0) {
+        const totalDebit = res.data.reduce((s, r) => s + r.Debit, 0);
+        const totalCredit = res.data.reduce((s, r) => s + r.Credit, 0);
+
+        setSummary({
+          opening: res.data[res.data.length - 1].OpeningBalance,
+          closing: res.data[0].ClosingBalance,
+          debit: totalDebit,
+          credit: totalCredit
+        });
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
   return (
     <div className="container-fluid mt-3">
 
@@ -120,8 +149,13 @@ const InventoryDashboard = () => {
           <p className="text-muted">Transaction History</p>
         </div>
       {/* 🔥 FILTER */}
+
       <div className="row mb-3 gap-2">
         <div className="col-md-2">
+
+      <div className="row mb-3">
+        <div className="col-md-3">
+
           <select
             className="form-control"
             value={branch}
@@ -132,6 +166,7 @@ const InventoryDashboard = () => {
             <option value="CBE">CBE</option>
           </select>
         </div>
+
 
         {/* From Date */}
           <div className="col-md-3 d-flex justify-content-center align-items-center gap-2">
@@ -151,6 +186,7 @@ const InventoryDashboard = () => {
           </div>
           
          
+
 
       </div>
 
@@ -172,6 +208,7 @@ const InventoryDashboard = () => {
           </thead>
 
           <tbody>
+
               {data.length > 0 ? (
                 data.map((row, i) => (
                   <tr key={i}>
@@ -215,6 +252,44 @@ const InventoryDashboard = () => {
                 </tr>
               )}
             </tbody>
+
+            {data.map((row, i) => (
+              <tr key={i}>
+
+                <td>
+                  {new Date(row.TranDate).toLocaleDateString()}
+                </td>
+
+                <td>{row.VoucherNo}</td>
+
+                <td>
+                  <span className={`badge 
+                    ${row.TranType === "EXPENSE" ? "bg-danger" :
+                      row.TranType === "RECEIPT" ? "bg-success" :
+                      "bg-warning text-dark"}`}>
+                    {row.TranType}
+                  </span>
+                </td>
+
+                <td>{row.Description}</td>
+
+                <td className="text-danger fw-bold">
+                  {row.Debit > 0 ? `₹ ${row.Debit}` : "-"}
+                </td>
+
+                <td className="text-success fw-bold">
+                  {row.Credit > 0 ? `₹ ${row.Credit}` : "-"}
+                </td>
+
+                <td>{row.OpeningBalance}</td>
+
+                <td className="fw-bold">
+                  ₹ {row.ClosingBalance}
+                </td>
+
+              </tr>
+            ))}
+          </tbody>
 
         </table>
       </div>
