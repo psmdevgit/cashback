@@ -1,19 +1,45 @@
-import { useState } from "react";
-import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 
 import Login from "./components/Login";
-import Admin from "./pages/Admin";
 import Entry from "./pages/Entry";
+import SuspenseEntry from "./pages/SuspenseEntry";
+import InventoryDashboard from "./pages/InventoryDashboard";
+import MainLayout from "./components/MainLayout";
 
 function App() {
+
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-     <Router>
+    <Router>
+
       <Routes>
+
+        {/* 🔐 LOGIN PAGE (NO SIDEBAR) */}
         <Route path="/" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/entry" element={<Entry />} />
+
+        {/* 🔥 PROTECTED LAYOUT */}
+        <Route
+          path="/"
+          element={
+            <MainLayout
+              isSidebarOpen={isSidebarOpen}
+              toggleSidebar={toggleSidebar}
+            />
+          }
+        >
+          <Route path="inventory" element={<InventoryDashboard />} />
+          <Route path="entry" element={<Entry />} />
+          <Route path="suspense" element={<SuspenseEntry />} />
+        </Route>
+
       </Routes>
+
     </Router>
   );
 }

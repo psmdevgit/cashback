@@ -21,11 +21,11 @@ function Navbar({ toggleSidebar }) {
             <i className="bi bi-list fs-1 text-white"></i>
           </button>
 
-          <img
+          {/* <img
             src={logo}
             alt="Logo"
             className="navlogo"
-          />
+          /> */}
         </div>
 
         {/* USER */}
