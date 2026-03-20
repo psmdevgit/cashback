@@ -13,7 +13,17 @@
   min-height: 100vh;
   transition: 0.3s;
 }
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  height: 100%;
+  transition: 0.3s;
+}
 
+.sidebar.open {
+  left: 0;
+}
 .sidebar a {
   color: white;
 }
@@ -22,7 +32,9 @@
   flex: 1;
 }
   .navlogo{
-width: 120px;
+    display: flex;
+    justify-content: center;
+width: 100px;
 object-fit: contain;
   }
 
