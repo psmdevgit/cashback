@@ -4,7 +4,13 @@ import API from "../axios";
 const InventoryDashboard = () => {
 
   const [data, setData] = useState([]);
-  const [branch, setBranch] = useState(localStorage.getItem("branch") || "CPT");
+  // const [branch, setBranch] = useState(localStorage.getItem("branch") || "");
+
+  const userbranch = localStorage.getItem("branch").trim();
+
+  const [branch, setBranch] = useState(
+    userbranch === "HO" ? "" : userbranch
+  );
 
   const [summary, setSummary] = useState({
     opening: 0,
@@ -97,17 +103,43 @@ const InventoryDashboard = () => {
       {/* FILTER */}
       <div className="row mb-3 align-items-center">
 
-        <div className="col-md-3">
+        {/* <div className="col-md-3">
           <select
             className="form-control"
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
-          >
+          >            
+            <option value="">ALL</option>
             <option value="CPT">CPT</option>
-            <option value="PNM">PNM</option>
+            <option value="TVL">TVL</option>
             <option value="CBE">CBE</option>
+            <option value="TPJ">TPJ</option>
+            <option value="TVM">TVM</option>
+            <option value="PMLE">PMLE</option>
+            <option value="SLM">SLM</option>
+            <option value="PADI">PADI</option>
           </select>
-        </div>
+        </div> */}
+        {userbranch === "HO" && (
+          <div className="col-md-3">
+            <select
+              className="form-control"
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+            >
+              <option value="">ALL</option>
+              <option value="CPT">CPT</option>
+              <option value="TVL">TVL</option>
+              <option value="CBE">CBE</option>
+              <option value="TPJ">TPJ</option>
+              <option value="TVM">TVM</option>
+              <option value="PMLE">PMLE</option>
+              <option value="SLM">SLM</option>
+              <option value="PADI">PADI</option>
+            </select>
+          </div>
+        )}
+
 
         <div className="col-md-4 d-flex gap-2 align-items-center">
           <input

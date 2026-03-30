@@ -6,6 +6,7 @@ import API from "../axios";
 const Entry = () => {
 
     
+   const userbranch = localStorage.getItem("branch"); 
 
     const today = new Date().toISOString().split("T")[0];
 const [form, setForm] = useState({
@@ -17,7 +18,8 @@ const [form, setForm] = useState({
     Date: new Date().toISOString().split("T")[0], // ✅ default
     ApprovedBy: "",
     Amount: "",
-    Purpose: ""
+    Purpose: "",
+    Branch: userbranch || ""  
 });
 const getFormType = (type) => {
   switch (type) {
@@ -46,6 +48,15 @@ const getFormType = (type) => {
                 Date: new Date().toISOString().split("T")[0] // ✅ correct
             }));
         });
+}, []);
+
+useEffect(() => {
+    if (userbranch) {
+        setForm(prev => ({
+            ...prev,
+            Branch: userbranch
+        }));
+    }
 }, []);
 
 const generateVoucher = async () => {
@@ -119,7 +130,9 @@ const handleDateChange = (e) => {
         !form.Date ||
         !form.ApprovedBy ||
         !form.Amount ||
-        !form.Purpose
+        !form.Purpose   ||
+        !form.Branch
+
     ) {
         setMessage("⚠️ All fields are mandatory!");
         return;
@@ -140,8 +153,6 @@ const handleDateChange = (e) => {
     
     console.log(form)
 
-    return;
-
     try {
         await API.post("/expenses", form);
 
@@ -161,7 +172,8 @@ const handleDateChange = (e) => {
             Date: new Date().toISOString().split("T")[0],
             ApprovedBy: "",
             Amount: "",
-            Purpose: ""
+            Purpose: "",
+            Branch: userbranch || ""
         });
 window.location.reload(); // Force reload to get new voucher number
     } catch (err) {

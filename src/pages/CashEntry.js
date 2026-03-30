@@ -3,6 +3,8 @@ import API from "../axios";
 
 export default function CashEntry() {
 
+  const userbranch = localStorage.getItem("branch");
+
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -50,7 +52,7 @@ export default function CashEntry() {
     }
 
     await API.post("/cash-entry", {
-      fromDate, toDate, opening, expenses, suspense, handCash
+      fromDate, toDate, opening, expenses, suspense, handCash, userbranch
     });
 
     alert("✅ Submitted Successfully");

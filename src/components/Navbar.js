@@ -6,6 +6,9 @@ function Navbar({ toggleSidebar }) {
 
   const navigate = useNavigate();
 
+   const userName = localStorage.getItem("branch"); // make sure key matches your login
+
+
   return (
     <nav className="navbar navbar-expand-lg navbar-white bg-whit shadow" style={{background:'#2B7CD3'}}>
       <div className="container-fluid d-flex justify-content-between">
@@ -31,7 +34,7 @@ function Navbar({ toggleSidebar }) {
         {/* USER */}
         <div className="d-flex align-items-center gap-2 text-white px-lg-3 " onClick={()=> navigate("/")}>
           <i className="bi bi-person-circle fs-5 text-black"></i>
-          <span className="fw-semibold">Hello, User</span>
+          <span className="fw-semibold">{userName ? userName+' User' : "User"}</span>
         </div>
 
       </div>

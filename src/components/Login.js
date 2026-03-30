@@ -42,10 +42,13 @@ function Login() {
 
     if (data.status === "success") {
       localStorage.setItem("user", JSON.stringify(data.data));
-      localStorage.setItem("branch", data.data.username);
+      const branchcode = data.data.branchCode.trim();
+      localStorage.setItem("branch", branchcode);
       // 🔀 redirect based on role
       if (data.data.role === "1") {
-        navigate("/admin");   // 👈 Admin page
+        // navigate("/admin");   // 👈 Admin page
+        
+       navigate("/inventory");
       } else {
        navigate("/inventory");   // 👈 Inventory page
       }

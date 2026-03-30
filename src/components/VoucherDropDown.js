@@ -4,6 +4,8 @@ import API from "../axios";
 
 const VoucherDropdown = ({ setVoucher }) => {
   const [options, setOptions] = useState([]);
+  
+   const userBranch = localStorage.getItem("branch").trim(); 
 
   useEffect(() => {
     fetchVouchers();
@@ -11,7 +13,7 @@ const VoucherDropdown = ({ setVoucher }) => {
 
   const fetchVouchers = async () => {
     try {
-      const res = await API.get("/suspense-active");
+      const res = await API.get(`/suspense-active?branch=${userBranch}`);
 
       // Convert API data → dropdown format
       const formatted = res.data.map(item => ({
