@@ -35,7 +35,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
           <i className="bi bi-pencil-square me-2"></i>
           <Link to="/dailyTransaction" className="text-decoration-none text-white">
             Daily Transcations
-
+</Link>
           <i className="bi bi-cash-coin me-2"></i>
           <Link to="/products" className="text-decoration-none text-white">
             Denomination
@@ -49,7 +49,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
           <i className="bi bi-cash-coin me-2"></i>
           <Link to="/cashentry" className="text-decoration-none text-white">
             Denomination
-
+</Link>
           <i className="bi bi-file-text me-2"></i>
           <Link to="/entry" className="text-decoration-none text-white">
             Expenses
