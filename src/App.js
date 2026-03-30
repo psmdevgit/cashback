@@ -6,6 +6,8 @@ import Entry from "./pages/Entry";
 import SuspenseEntry from "./pages/SuspenseEntry";
 import InventoryDashboard from "./pages/InventoryDashboard";
 import MainLayout from "./components/MainLayout";
+import CashEntry from "./pages/CashEntry";
+import CashEntryReports from "./pages/CashEntryReports";
 
 function App() {
 
@@ -32,7 +34,9 @@ function App() {
               toggleSidebar={toggleSidebar}
             />
           }
-        >
+        >    
+      <Route path="cashentry" element={<CashEntry />} />
+         <Route path="cashreports" element={<CashEntryReports />} />
           <Route path="inventory" element={<InventoryDashboard />} />
           <Route path="entry" element={<Entry />} />
           <Route path="suspense" element={<SuspenseEntry />} />

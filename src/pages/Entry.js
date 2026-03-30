@@ -130,7 +130,17 @@ const handleDateChange = (e) => {
         return;
     }
 
+    if (form.Type.toLocaleLowerCase() == 'expenses'){
+        if(Number(form.Amount > 10000)){
+            setMessage("⚠️ Expenses Amount below 10,000 only");
+        }
+    }
+
     setLoading(true);
+    
+    console.log(form)
+
+    return;
 
     try {
         await API.post("/expenses", form);
@@ -225,9 +235,25 @@ window.location.reload(); // Force reload to get new voucher number
 />
                     </div>
 
-                    <div className="col-md-6">
+                    {/* <div className="col-md-6">
                         <label>Approved By</label>
                         <input className="form-control" name="ApprovedBy" onChange={handleChange} />
+                    </div> */}
+
+                    <div className="col-md-6">
+                    <label>Approved By</label>
+
+                    <select
+                        className="form-control"
+                        name="ApprovedBy"
+                        value={form.ApprovedBy}   // ✅ bind state
+                        onChange={handleChange}
+                    >
+                        <option value="">Select Approver</option>
+                        <option value="Director">Director</option>
+                        <option value="VP/CFO">VP/CFO</option>
+                        <option value="GM/BM/SRM">GM/BM/SRM</option>
+                    </select>
                     </div>
 
                     <div className="col-md-6">
