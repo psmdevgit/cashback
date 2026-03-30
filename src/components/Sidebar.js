@@ -36,6 +36,8 @@ function Sidebar({ isOpen, toggleSidebar }) {
           <Link to="/dailyTransaction" className="text-decoration-none text-white">
             Daily Transcations
 </Link>
+</li>
+  <li className="py-2 px-4">
           <i className="bi bi-cash-coin me-2"></i>
           <Link to="/products" className="text-decoration-none text-white">
             Denomination
