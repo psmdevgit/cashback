@@ -11,7 +11,7 @@ const SuspenseGrid = () => {
   const [categories, setCategories] = useState([]);
 
   
-   const userBranch = localStorage.getItem("branch").trim(); 
+  //  const userBranch = localStorage.getItem("branch").trim(); 
 
 
 useEffect(() => {
