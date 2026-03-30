@@ -10,6 +10,10 @@ const SuspenseGrid = () => {
   const [message, setMessage] = useState("");
   const [categories, setCategories] = useState([]);
 
+  
+   const userBranch = localStorage.getItem("branch").trim(); 
+
+
 useEffect(() => {
   API.get("/categories").then(res => {
     setCategories(res.data);
@@ -203,14 +207,28 @@ const handleSubmit = async () => {
 
       {/* Approved */}
       <td>
-        <input
+        {/* <input
           className="form-control"
           value={row.ApprovedBy}
           disabled={row.saved}
           onChange={(e) =>
             handleChange(i, "ApprovedBy", e.target.value)
           }
-        />
+        /> */}
+         <select
+    className="form-control"
+    value={row.ApprovedBy || ""}
+    disabled={row.saved}
+    onChange={(e) =>
+      handleChange(i, "ApprovedBy", e.target.value)
+    }
+  >
+    <option value="">Select</option>
+    <option value="Director">Director</option>
+    <option value="VP/CFO">VP/CFO</option>
+    <option value="GM/BM/SRM">GM/BM/SRM</option>
+  </select>
+  
       </td>
 
       {/* Amount */}

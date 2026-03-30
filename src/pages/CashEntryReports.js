@@ -300,6 +300,23 @@ import API from "../axios";
 
 export default function Approval() {
 
+  const userbranch = localStorage.getItem("branch").trim();
+  
+  // const user = localStorage.getItem("user");
+  const user = JSON.parse(localStorage.getItem("user") || "{}"); // parse user object
+
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [branch, setBranch] = useState(
+    userbranch === "HO" ? "" : userbranch
+  );
+
+  //   useEffect(() => {
+  //   const today = new Date().toISOString().split("T")[0];
+  //   setFromDate(today);
+  //   setToDate(today);
+  // }, []);
+
   const [data, setData] = useState([]);
   const [summaryData, setSummaryData] = useState([]);
 
@@ -353,14 +370,31 @@ export default function Approval() {
     }
   };
 
+  // useEffect(() => {
+  //   loadData();
+  // }, []);
+
   useEffect(() => {
     loadData();
-  }, []);
+  console.log(user);
+}, [fromDate, toDate, branch]);
 
+
+  // const loadData = async () => {
+  //   const res = await API.get("/cash-entry-list");
+  //   setData(res.data);
+  // };
   const loadData = async () => {
-    const res = await API.get("/cash-entry-list");
+  try {
+    const res = await API.get(`/cash-entry-list?branch=${branch}&fromDate=${fromDate}&toDate=${toDate}`, {
+    });
+
     setData(res.data);
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   // 🔥 APPROVE
   const handleApprove = async () => {
@@ -390,6 +424,64 @@ export default function Approval() {
       <h3 className="mb-3 text-center">✅ Cash Entry Approval</h3>
 
       {/* TABLE */}
+
+      <div className="row mb-3 align-items-center">
+
+
+          {/* 🏢 Branch */}
+          <div className="col-md-3">
+            <label>Branch</label>
+
+            {userbranch === "HO" ? (
+              <select
+                className="form-control"
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+              >
+                <option value="">ALL</option>
+                <option value="CPT">CPT</option>
+                <option value="TVL">TVL</option>
+                <option value="CBE">CBE</option>
+                <option value="TPJ">TPJ</option>
+                <option value="TVM">TVM</option>
+                <option value="PMLE">PMLE</option>
+                <option value="SLM">SLM</option>
+                <option value="PADI">PADI</option>
+              </select>
+            ) : (
+              <input
+                className="form-control"
+                value={branch}
+                readOnly
+              />
+            )}
+          </div>
+          
+          {/* 📅 From Date */}
+          <div className="col-md-3">
+            <label>From Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+
+          {/* 📅 To Date */}
+          <div className="col-md-3">
+            <label>To Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
+
+        </div>
+
+
       <div className="card shadow rounded-4">
         <div className="card-body table-responsive">
 
@@ -404,7 +496,7 @@ export default function Approval() {
                 <th>Suspense</th>
                 <th>Hand Cash</th>
                 <th>Status</th>
-                <th>Action</th>
+                 {(user.role === '1' || user.role === '2') && <th>Action</th>}
                 <th>View</th>
               </tr>
             </thead>
@@ -429,29 +521,42 @@ export default function Approval() {
                     </span>
                   </td>
 
-                  <td>
-                    {row.Status === "Pending L1" && (
-                      <button
-                        className="btn btn-sm btn-warning"
-                        onClick={() => setSelected({ id: row.Id, level: "L1" })}
-                      >
-                        Approve L1
-                      </button>
-                    )}
 
-                    {row.Status === "Approved L1" && (
+
+                  {user.role === "2" && 
+                    <td>
+                        {row.Status === "Pending L1" ?(
+                          <button
+                            className="btn btn-sm btn-warning"
+                            onClick={() => setSelected({ id: row.Id, level: "L1" })}
+                          >
+                            Approve L1
+                          </button>
+                        ) : ( <span className="badge bg-success text-white">Approved</span>)}
+                        {loadingId === row.Id && (
+                          <div className="spinner-border spinner-border-sm ms-2"></div>
+                        )}
+                    </td>}
+
+                    {user.role == "1" &&  <td>                    
+
+                    {row.Status === "Approved L1" ? (
                       <button
                         className="btn btn-sm btn-success"
                         onClick={() => setSelected({ id: row.Id, level: "L2" })}
                       >
                         Approve L2
                       </button>
-                    )}
+                    ) : ( <span className="badge bg-success text-white">Approved</span>)}
 
                     {loadingId === row.Id && (
                       <div className="spinner-border spinner-border-sm ms-2"></div>
                     )}
                   </td>
+                  }
+                 
+                
+
 
                   <td>
                     <button
