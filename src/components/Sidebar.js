@@ -37,13 +37,13 @@ function Sidebar({ isOpen, toggleSidebar }) {
             Daily Transcations
 </Link>
 </li>
-  <li className="py-2 px-4">
+  {/* <li className="py-2 px-4">
           <i className="bi bi-cash-coin me-2"></i>
           <Link to="/products" className="text-decoration-none text-white">
             Denomination
 
           </Link>
-        </li>
+        </li> */}
 
 
         <li className="py-2 px-4">
@@ -52,6 +52,8 @@ function Sidebar({ isOpen, toggleSidebar }) {
           <Link to="/cashentry" className="text-decoration-none text-white">
             Denomination
 </Link>
+</li>
+ <li className="py-2 px-4">
           <i className="bi bi-file-text me-2"></i>
           <Link to="/entry" className="text-decoration-none text-white">
             Expenses
@@ -59,13 +61,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
           </Link>
         </li>
 
-        <li className="py-2 px-4">
-          <i className="bi bi-file-text me-2"></i>
-
-          <Link to="/entry" className="text-decoration-none text-white">
-            Expenses
-          </Link>
-        </li>
+   
 
         <li className="py-2 px-4">
           <i className="bi bi-file-text me-2"></i>
