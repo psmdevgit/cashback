@@ -21,13 +21,13 @@ export default function CashEntry() {
   useEffect(() => {
     if (fromDate && toDate) {
       API.get("/cash-summary", {
-        params: { fromDate, toDate }
+        params: { fromDate, toDate, userbranch }
       }).then(res => {
         setExpenses(res.data.expenses || 0);
         setSuspense(res.data.suspense || 0);
       });
     }
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, userbranch]);
 
   // 🔹 Calculate Hand Cash
   const handCash =
