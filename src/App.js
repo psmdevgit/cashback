@@ -8,6 +8,7 @@ import InventoryDashboard from "./pages/InventoryDashboard";
 
 import DailyTransaction from "./pages/DailyTransaction";
 
+import SuspensesReport from "./pages/SuspenseReports";
 import MainLayout from "./components/MainLayout";
 import CashEntry from "./pages/CashEntry";
 import CashEntryReports from "./pages/CashEntryReports";
@@ -46,6 +47,7 @@ function App() {
 
           <Route path="entry" element={<Entry />} />
           <Route path="suspense" element={<SuspenseEntry />} />
+          <Route path="suspensereports" element={<SuspensesReport />} />
         </Route>
 
       </Routes>
