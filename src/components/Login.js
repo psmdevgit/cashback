@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import logo from "../assets/pos.png";
 import "../style/login.css";
 
+import API from "../axios";
+
 import { useNavigate } from "react-router-dom";
 
 
@@ -13,46 +15,86 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const apiurl = 'http://localhost:8000'
+  // const apiurl = 'http://localhost:8000'
 
-  async function handleLogin() {
+//   async function handleLogin() {
+//   try {
+
+//     if(username == ''){        
+//       setErrorMsg("Enter username");
+//       return;
+//     }
+//     if(password == ''){
+//       setErrorMsg("Enter password");
+//       return;
+//     }
+
+//     const response = await API.post(`${apiurl}/api/login`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         username: username,
+//         password: password,
+//       }),
+//     });
+
+//     const data = await response.json();
+
+//     if (data.status === "success") {
+//       localStorage.setItem("user", JSON.stringify(data.data));
+//       const branchcode = data.data.branchCode.trim();
+//       localStorage.setItem("branch", branchcode);
+//       // 🔀 redirect based on role
+//       if (data.data.role === "1") {
+//         // navigate("/admin");   // 👈 Admin page
+        
+//        navigate("/inventory");
+//       } else {
+//        navigate("/inventory");   // 👈 Inventory page
+//       }
+
+//     } else {
+//       setErrorMsg("Invalid username or password");
+//     }
+
+//   } catch (error) {
+//     console.error(error);
+//     setErrorMsg("Technical issue");
+//   }
+// }
+
+async function handleLogin() {
   try {
-
-    if(username == ''){        
+    if (username === "") {
       setErrorMsg("Enter username");
       return;
     }
-    if(password == ''){
+
+    if (password === "") {
       setErrorMsg("Enter password");
       return;
     }
 
-    const response = await fetch(`${apiurl}/api/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
+    const response = await API.post("/login", {
+      username: username,
+      password: password,
     });
 
-    const data = await response.json();
+    const data = response.data; // ✅ Axios uses .data
 
     if (data.status === "success") {
       localStorage.setItem("user", JSON.stringify(data.data));
+
       const branchcode = data.data.branchCode.trim();
       localStorage.setItem("branch", branchcode);
-      // 🔀 redirect based on role
-      if (data.data.role === "1") {
-        // navigate("/admin");   // 👈 Admin page
-        
-       navigate("/inventory");
-      } else {
-       navigate("/inventory");   // 👈 Inventory page
-      }
 
+      if (data.data.role === "1") {
+        navigate("/inventory");
+      } else {
+        navigate("/inventory");
+      }
     } else {
       setErrorMsg("Invalid username or password");
     }

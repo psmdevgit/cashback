@@ -514,10 +514,10 @@ export default function Approval() {
 
                   <td>
                     <span className={`badge px-3 py-2
-                      ${row.Status === "Pending L1" ? "bg-warning text-dark" :
-                        row.Status === "Approved L1" ? "bg-info" :
-                        "bg-success"}`}>
-                      {row.Status}
+                      ${row.Status === "Pending L1" ? "text-warning" :
+                        row.Status === "Approved L1" ? "text-info" :
+                        "text-success"}`}>
+                      {row.Status === "Pending L1" ? "Pending" : row.Status === "Approved L1" ? "GM Approved" : "HO Aproved"}
                     </span>
                   </td>
 
