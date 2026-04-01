@@ -39,7 +39,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
 </li>
   {/* <li className="py-2 px-4">
           <i className="bi bi-cash-coin me-2"></i>
-          <Link to="/products" className="text-decoration-none text-white">
+          <Link to="/cashentry" className="text-decoration-none text-white">
             Denomination
 
           </Link>
@@ -70,13 +70,14 @@ function Sidebar({ isOpen, toggleSidebar }) {
           </Link>
         </li>
 
-         <li className="py-2 px-4">
+ {/* <li className="py-2 px-4">
           <i className="bi bi-file-text me-2"></i>
-          <Link to="/cashreports" className="text-decoration-none text-white">
-            Cash Reports
+          <Link to="/cashentry" className="text-decoration-none text-white">
+            Cash Entry
           </Link>
-        </li>
-        
+        </li> */}
+
+
          <li className="py-2 px-4">
           <i className="bi bi-file-text me-2"></i>
           <Link to="/suspensereports" className="text-decoration-none text-white">

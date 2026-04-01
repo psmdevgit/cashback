@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+
 import API from "../axios";
 
 export default function CashEntry() {
 
   const userbranch = localStorage.getItem("branch");
+
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -30,6 +32,7 @@ export default function CashEntry() {
   }, [fromDate, toDate, userbranch]);
 
   // 🔹 Calculate Hand Cash
+
   const handCash =
     denominations[500]*500 +
     denominations[200]*200 +
@@ -42,16 +45,15 @@ export default function CashEntry() {
     denominations.c2*2 +
     denominations.c1*1;
 
+
   const isBalanced = opening === (expenses + suspense + handCash);
 
   // 🔹 Submit
   const handleSubmit = async () => {
     if (!isBalanced) {
       alert("❌ Amount not matched!");
-      return;
-    }
-
     await API.post("/cash-entry", {
+
       fromDate, toDate, opening, expenses, suspense, handCash, userbranch
     });
 
