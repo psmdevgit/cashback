@@ -54,6 +54,38 @@ const getFormType = (type) => {
 }, []);
 
 useEffect(() => {
+  if (form.Type === "Suspenses") {
+
+    const filtered = categories.filter(
+      (c) => c.ExpenseCategory?.toLowerCase().includes("suspense")
+    );
+
+    setFilteredCategories(filtered);
+
+    // 🔥 AUTO SELECT FIRST SUSPENSE CATEGORY
+    if (filtered.length > 0) {
+      const first = filtered[0];
+
+      setForm(prev => ({
+        ...prev,
+        ExpenseCategory: first.ExpenseCategory,
+        LedgerName: first.LedgerName
+      }));
+    }
+
+  } else {
+    setFilteredCategories(categories);
+
+    // 🔄 Reset category when not suspense
+    setForm(prev => ({
+      ...prev,
+      ExpenseCategory: "",
+      LedgerName: ""
+    }));
+  }
+}, [form.Type, categories]);
+
+useEffect(() => {
     if (userbranch) {
         setForm(prev => ({
             ...prev,
@@ -243,15 +275,32 @@ window.location.reload();
 
                     <div className="col-md-6">
                         <label>Category</label>
-                        <select className="form-control" name="ExpenseCategory" onChange={handleChange}>
+                        {/* <select className="form-control" name="ExpenseCategory" onChange={handleChange}>
                             <option value="">Select</option>
-                            {/* {categories.map(c => ( */}
                             {filteredCategories.map(c => (
                                 <option key={c.Id} value={c.Id}>
                                     {c.ExpenseCategory}
                                 </option>
                             ))}
-                        </select>
+                        </select> */}
+
+                        <select
+                            className="form-control"
+                            name="ExpenseCategory"
+                            value={
+                                categories.find(c => c.ExpenseCategory === form.ExpenseCategory)?.Id || ""
+                            }
+                            onChange={handleChange}
+                            disabled={form.Type === "Suspenses"}   // 🔥 disable for suspense
+                            >
+                            <option value="">Select</option>
+                            {filteredCategories.map(c => (
+                                <option key={c.Id} value={c.Id}>
+                                {c.ExpenseCategory}
+                                </option>
+                            ))}
+                            </select>
+
                     </div>
 
                     <div className="col-md-6">

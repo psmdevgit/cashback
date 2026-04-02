@@ -128,12 +128,9 @@ export default function Approval() {
 
       <h3 className="mb-3 text-center">Cash Entry Approval</h3>
 
-      {/* TABLE */}
 
       <div className="row mb-3 align-items-center">
 
-
-          {/* 🏢 Branch */}
           <div className="col-md-3">
             <label>Branch</label>
 
@@ -161,8 +158,6 @@ export default function Approval() {
               />
             )}
           </div>
-          
-          {/* 📅 From Date */}
           <div className="col-md-3">
             <label>From Date</label>
             <input
@@ -173,7 +168,6 @@ export default function Approval() {
             />
           </div>
 
-          {/* 📅 To Date */}
           <div className="col-md-3">
             <label>To Date</label>
             <input
@@ -186,98 +180,6 @@ export default function Approval() {
 
         </div>
 
-
-      {/* <div className="card shadow rounded-4">
-        <div className="card-body table-responsive">
-
-          <table className="table table-hover align-middle text-center">
-
-            <thead className="table-dark">
-              <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Opening</th>
-                <th>Expenses</th>
-                <th>Suspense</th>
-                <th>Hand Cash</th>
-                <th>Status</th>
-                 {(user.role === '1' || user.role === '2') && <th>Action</th>}
-                <th>View</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {data.map((row) => (
-                <tr key={row.Id}>
-                  <td>{row.FromDate}</td>
-                  <td>{row.ToDate}</td>
-
-                  <td>₹ {row.Opening}</td>
-                  <td className="text-danger">₹ {row.Expenses}</td>
-                  <td className="text-warning">₹ {row.Suspense}</td>
-                  <td className="fw-bold">₹ {row.HandCash}</td>
-
-                  <td>
-                    <span className={`badge px-3 py-2
-                      ${row.Status === "Pending L1" ? "text-warning" :
-                        row.Status === "Approved L1" ? "text-info" :
-                        "text-success"}`}>
-                      {row.Status === "Pending L1" ? "Pending" : row.Status === "Approved L1" ? "GM Approved" : "HO Aproved"}
-                    </span>
-                  </td>
-
-
-
-                  {user.role === "2" && 
-                    <td>
-                        {row.Status === "Pending L1" ?(
-                          <button
-                            className="btn btn-sm btn-warning"
-                            onClick={() => setSelected({ id: row.Id, level: "L1" })}
-                          >
-                            Approve L1
-                          </button>
-                        ) : ( <span className="badge bg-success text-white">Approved</span>)}
-                        {loadingId === row.Id && (
-                          <div className="spinner-border spinner-border-sm ms-2"></div>
-                        )}
-                    </td>}
-
-                    {user.role == "1" &&  <td>                    
-
-                    {row.Status === "Approved L1" ? (
-                      <button
-                        className="btn btn-sm btn-success"
-                        onClick={() => setSelected({ id: row.Id, level: "L2" })}
-                      >
-                        Approve L2
-                      </button>
-                    ) : ( <span className="badge bg-success text-white">Approved</span>)}
-
-                    {loadingId === row.Id && (
-                      <div className="spinner-border spinner-border-sm ms-2"></div>
-                    )}
-                  </td>
-                  }
-                 
-                
-
-
-                  <td>
-                    <button
-                      className="btn btn-info btn-sm"
-                      onClick={() => openModal(row.FromDate, row.ToDate)}
-                    >
-                      👁 View
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-        </div>
-      </div> */}
 
 <div className="table-responsive" style={{ maxHeight: "700px", overflowY: "auto" }}>
   

@@ -91,9 +91,9 @@ async function handleLogin() {
       localStorage.setItem("branch", branchcode);
 
       if (data.data.role === "1") {
-        navigate("/inventory");
+        navigate("/dailyTransaction");
       } else {
-        navigate("/inventory");
+        navigate("/dailyTransaction");
       }
     } else {
       setErrorMsg("Invalid username or password");

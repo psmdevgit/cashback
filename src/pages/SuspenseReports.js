@@ -9,7 +9,8 @@ const SuspenseReports = () => {
   const [branch, setBranch] = useState(userbranch === "HO" ? "" : userbranch);
   
   const user = JSON.parse(localStorage.getItem("user") || "{}"); // parse user object
-
+  
+  const role = user.role;
   const [summary, setSummary] = useState({ opening: 0, closing: 0, debit: 0, credit: 0 });
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -123,20 +124,46 @@ const handleExport = () => {
     return;
   }
 
-  const exportData = data.map((row) => ({
+  // const exportData = data.map((row) => ({
+  //   Date: new Date(row.Date).toLocaleDateString(),
+  //   Branch: row.Branch,
+  //   Voucher: row.VoucherNo,
+  //   EmpID: row.EmpID,
+  //   Description: row.Description,
+  //   Ledger: row.LedgerName,
+  //   "Adv Amount": row.AdvAmount,
+  //   "Used Amount": row.UsedAmount,
+  //   Balance: row.Balance,
+  //   "Expense ID": row.ExpenseID,
+  //   Status: row.Status,
+  //   Approved: row.Approved || "-"
+  // }));
+
+  const exportData = data.map((row) => {
+  const baseData = {
     Date: new Date(row.Date).toLocaleDateString(),
-    Branch: row.Branch,
     Voucher: row.VoucherNo,
-    EmpID: row.EmpID,
     Description: row.Description,
     Ledger: row.LedgerName,
     "Adv Amount": row.AdvAmount,
     "Used Amount": row.UsedAmount,
     Balance: row.Balance,
     "Expense ID": row.ExpenseID,
-    Status: row.Status,
     Approved: row.Approved || "-"
-  }));
+  };
+
+  // Show extra fields only for role 1 & 2
+  if (["1", "2"].includes(role)) {
+    return {
+      ...baseData,
+      Branch: row.Branch,
+      EmpID: row.EmpID,
+      Status: row.Status
+    };
+  }
+
+  return baseData;
+});
 
   const worksheet = XLSX.utils.json_to_sheet(exportData);
 
@@ -182,7 +209,7 @@ const handleExport = () => {
       <h3 className="text-center mb-4">Suspense Reports</h3>
 
       {/* FILTER */}
-      <div className="row mb-3 align-items-center">
+      {/* <div className="row mb-3 align-items-center">
         {userbranch === "HO" && (
           <div className="col-md-2">
             <select className="form-control" value={branch} onChange={(e) => setBranch(e.target.value)}>
@@ -222,8 +249,69 @@ const handleExport = () => {
         </button>
       </div>        
 
-      </div>
+      </div> */}
 
+ <div className="row mb-3 align-items-center g-2">
+    {/* Branch Dropdown (only for HO) */}
+    {userbranch === "HO" && (
+      <div className="col-md-2">
+        <select
+          className="form-select form-select-sm"
+          value={branch}
+          onChange={(e) => setBranch(e.target.value)}
+        >
+          <option value="">ALL</option>
+          <option value="CPT">CPT</option>
+          <option value="TVL">TVL</option>
+          <option value="CBE">CBE</option>
+          <option value="TPJ">TPJ</option>
+          <option value="TVM">TVM</option>
+          <option value="PMLE">PMLE</option>
+          <option value="SLM">SLM</option>
+          <option value="PADI">PADI</option>
+        </select>
+      </div>
+    )}
+
+    {/* Status Dropdown */}
+    <div className="col-md-2">
+      <select
+        className="form-select form-select-sm"
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+      >
+        <option value="completed">Completed</option>
+        <option value="pending">Pending</option>
+      </select>
+    </div>
+
+    {/* Date Range */}
+    <div className="col-md-4 d-flex gap-2 align-items-center">
+      <input
+        type="date"
+        className="form-control form-control-sm"
+        value={fromDate}
+        onChange={(e) => setFromDate(e.target.value)}
+      />
+      <span className="mx-1">To</span>
+      <input
+        type="date"
+        className="form-control form-control-sm"
+        value={toDate}
+        onChange={(e) => setToDate(e.target.value)}
+      />
+    </div>
+
+    {/* Export Button */}
+    <div className="col-md-2 d-flex justify-content-start">
+      <button
+        className="btn btn-success btn-sm"
+        onClick={handleExport}
+      >
+        Export Excel
+      </button>
+    </div>
+  </div>
 
 
       {/* TABLE */}
