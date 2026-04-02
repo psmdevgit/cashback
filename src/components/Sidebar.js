@@ -184,6 +184,12 @@ function Sidebar({ isOpen, toggleSidebar }) {
             Suspense Reports
           </Link>
         </li>
+          <li className="py-2 px-4">    
+      <i className="bi bi-file-text me-2"></i>
+          <Link to="/expensesreport" className="text-decoration-none text-white">
+            Expense Reports
+          </Link>
+        </li>
 
       </ul>
     </div>
