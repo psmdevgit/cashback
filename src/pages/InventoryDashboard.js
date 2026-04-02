@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../axios";
+import '../App.css'
 
 const InventoryDashboard = () => {
 
@@ -65,35 +66,35 @@ const InventoryDashboard = () => {
     <div className="container-fluid mt-3">
 
       {/* HEADER */}
-      <h3 className="text-center mb-4">Cash Inventory Dashboard</h3>
+      <h3 className="text-center mb-4 " >Cash Inventory Dashboard</h3>
 
       {/* SUMMARY */}
       <div className="row mb-4">
 
         <div className="col-md-3">
-          <div className="card shadow text-center p-3 bg-light">
-            <h6>Opening Balance</h6>
+          <div className="card invcard shadow text-center p-3 bg-light">
+            <h6 className="baseTextColor">Opening Balance</h6>
             <h4>₹ {summary.opening}</h4>
           </div>
         </div>
 
         <div className="col-md-3">
-          <div className="card shadow text-center p-3">
-            <h6>Total Debit</h6>
+          <div className="card invcard shadow text-center p-3">
+            <h6 className="baseTextColor">Total Debit</h6>
             <h4>₹ {summary.debit}</h4>
           </div>
         </div>
 
         <div className="col-md-3">
-          <div className="card shadow text-center p-3">
-            <h6>Total Credit</h6>
+          <div className="card invcard shadow text-center p-3">
+            <h6 className="baseTextColor">Total Credit</h6>
             <h4>₹ {summary.credit}</h4>
           </div>
         </div>
 
         <div className="col-md-3">
-          <div className="card shadow text-center p-3">
-            <h6>Closing Balance</h6>
+          <div className="card invcard shadow text-center p-3">
+            <h6 className="baseTextColor">Closing Balance</h6>
             <h4>₹ {summary.closing}</h4>
           </div>
         </div>
@@ -101,25 +102,9 @@ const InventoryDashboard = () => {
       </div>
 
       {/* FILTER */}
-      <div className="row mb-3 align-items-center">
+      <div className="row mb-3 align-items-center filter-small">
 
-        {/* <div className="col-md-3">
-          <select
-            className="form-control"
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-          >            
-            <option value="">ALL</option>
-            <option value="CPT">CPT</option>
-            <option value="TVL">TVL</option>
-            <option value="CBE">CBE</option>
-            <option value="TPJ">TPJ</option>
-            <option value="TVM">TVM</option>
-            <option value="PMLE">PMLE</option>
-            <option value="SLM">SLM</option>
-            <option value="PADI">PADI</option>
-          </select>
-        </div> */}
+     
         {userbranch === "HO" && (
           <div className="col-md-3">
             <select
@@ -163,7 +148,7 @@ const InventoryDashboard = () => {
       <div className="table-responsive">
         <table className="table table-bordered table-striped text-center">
 
-          <thead className="table-dark">
+          <thead className="table-primary">
             <tr>
               <th>Date</th>
               <th>Voucher</th>
@@ -185,8 +170,10 @@ const InventoryDashboard = () => {
 
                   <td>
                     <span className={`badge 
-                      ${row.TranType === "EXPENSE" ? "bg-danger" :
-                        row.TranType === "RECEIPT" ? "bg-success" :
+                      ${row.TranType.toLowerCase() === "expense" ? "bg-success" :
+                        row.TranType.toLowerCase() === "suspense" ? "bg-danger" :
+                        row.TranType.toLowerCase() === "receipt" ? "bg-primary " :
+                        row.TranType.toLowerCase() === "suspense_return" ? "bg-secondary " :
                         "bg-warning text-dark"}`}>
                       {row.TranType}
                     </span>

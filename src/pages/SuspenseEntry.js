@@ -95,12 +95,24 @@ useEffect(() => {
   const remaining =
     (master.AdvanceAmount || 0) - totalUsed;
 
+
+    useEffect(() => {
+  if (currentUsed > (master.AdvanceAmount || 0)) {
+    alert("❌ Current Entry exceeds Total Advance!");
+  }
+}, [currentUsed, master.AdvanceAmount]);
+
   // 🔹 Submit
 const handleSubmit = async () => {
 
   const confirmSave = window.confirm("Are you sure you want to submit?");
 
   if (!confirmSave) return;
+    if (currentUsed > (master.AdvanceAmount || 0)) {
+    alert("❌ Current Entry exceeds Total Advance!");
+    return;
+  }
+
 
   try {
     const newRows = rows.filter(r => !r.saved);
@@ -124,15 +136,22 @@ const handleSubmit = async () => {
     setRows(updated);
     setMessage("✅ Saved Successfully");
 
+     // 🔥 wait 2 seconds → reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+
+
   } catch (err) {
     alert(err.response?.data || "Error saving");
   }
 };
   
   return (
-    <div className="container mt-4">
+    <div className="container mt-3">
 
-      <h2 className="text-center mb-4">Suspense Entry</h2>
+      <h3 className="text-center mb-4">Suspense Entry</h3>
+
 
       {/* 🔹 TOP SECTION */}
       <div className="row mb-3">
@@ -165,7 +184,7 @@ const handleSubmit = async () => {
       {/* 🔹 GRID */}
       <div className="table-responsive">
         <table className="table table-bordered text-center">
-<thead className="table-dark">
+<thead className="table-primary">
   <tr>
     <th>ID</th>
     <th>Expense Category</th>
@@ -288,7 +307,7 @@ const handleSubmit = async () => {
 
       {/* 🔹 ACTION */}
       <div className="d-flex justify-content-between mt-3">
-        <button className="btn btn-primary" onClick={addRow}>
+        <button className="btn btn-secondary" onClick={addRow}>
           ➕ Add Row
         </button>
 

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Login from "./components/Login";
 import Entry from "./pages/Entry";
@@ -16,9 +16,44 @@ import ExpenseReport from "./pages/ExpensesReport";
 
 function App() {
 
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
+   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+useEffect(() => {
+  if (isSidebarOpen && window.innerWidth < 992) {
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100vh"; 
+  } else {
+    document.body.style.overflow = "auto";
+    document.body.style.height = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+    document.body.style.height = "auto";
+  };
+}, [isSidebarOpen]);
+
+   
+  // 👇 Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 992) {
+        setSidebarOpen(true); 
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    handleResize(); 
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleSidebar = () => {
+   
+    if (window.innerWidth >= 992) return;
+
     setSidebarOpen(!isSidebarOpen);
   };
 
@@ -26,11 +61,9 @@ function App() {
     <Router>
 
       <Routes>
-
-        {/* 🔐 LOGIN PAGE (NO SIDEBAR) */}
         <Route path="/" element={<Login />} />
 
-        {/* 🔥 PROTECTED LAYOUT */}
+        
         <Route
           path="/"
           element={
@@ -40,14 +73,13 @@ function App() {
             />
           }
         >    
-      <Route path="cashentry" element={<CashEntry />} />
-         <Route path="cashreports" element={<CashEntryReports />} />
+        
           <Route path="inventory" element={<InventoryDashboard />} />
-
           <Route path="dailyTransaction" element={<DailyTransaction/>} />
-
+          <Route path="cashentry" element={<CashEntry />} />
           <Route path="entry" element={<Entry />} />
           <Route path="suspense" element={<SuspenseEntry />} />
+          <Route path="cashreports" element={<CashEntryReports />} />
           <Route path="suspensereports" element={<SuspensesReport />} />
           <Route path="expensesreport" element={<ExpenseReport />} /> 
         </Route>

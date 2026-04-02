@@ -7,6 +7,9 @@ const Entry = () => {
 
     
    const userbranch = localStorage.getItem("branch"); 
+   const [filteredCategories, setFilteredCategories] = useState([]);
+
+   
 
     const today = new Date().toISOString().split("T")[0];
 const [form, setForm] = useState({
@@ -15,7 +18,7 @@ const [form, setForm] = useState({
     ExpenseCategory: "",
     LedgerName: "",
     EmployeeCode: "",
-    Date: new Date().toISOString().split("T")[0], // ✅ default
+    Date: new Date().toISOString().split("T")[0], 
     ApprovedBy: "",
     Amount: "",
     Purpose: "",
@@ -45,7 +48,7 @@ const getFormType = (type) => {
             setForm(prev => ({
                 ...prev,
                 VoucherNo: res.data.voucher,
-                Date: new Date().toISOString().split("T")[0] // ✅ correct
+                Date: new Date().toISOString().split("T")[0] 
             }));
         });
 }, []);
@@ -61,7 +64,7 @@ useEffect(() => {
 
 const generateVoucher = async () => {
   try {
-    const branch = localStorage.getItem("branch"); // ✅ from login
+    const branch = localStorage.getItem("branch"); 
     const formType = getFormType(form.Type);
 
     const res = await API.get(
@@ -86,7 +89,7 @@ useEffect(() => {
     generateVoucher();
   }
 }, [form.Type]);
-    // Fetch Categories
+
             useEffect(() => {
                 API.get("/categories")
             .then(res => setCategories(res.data));
@@ -98,7 +101,7 @@ const handleDateChange = (e) => {
         Date: e.target.value
     }));
 };
-    // Handle Change
+
    const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -118,10 +121,19 @@ const handleDateChange = (e) => {
     }
 };
 
-    // Submit
+useEffect(() => {
+  if (form.Type === "Suspenses") {
+    const filtered = categories.filter(
+      (c) => c.ExpenseCategory?.toLowerCase().includes("suspense")
+    );
+    setFilteredCategories(filtered);
+  } else {
+    setFilteredCategories(categories); // show all
+  }
+}, [form.Type, categories]);
+
   const handleSubmit = async () => {
 
-    // 🔴 Validation
     if (
         !form.VoucherNo ||
         !form.Type ||
@@ -146,6 +158,7 @@ const handleDateChange = (e) => {
     if (form.Type.toLocaleLowerCase() == 'expenses'){
         if(Number(form.Amount > 10000)){
             setMessage("⚠️ Expenses Amount below 10,000 only");
+            return;
         }
     }
 
@@ -154,15 +167,24 @@ const handleDateChange = (e) => {
     console.log(form)
 
     try {
-        await API.post("/expenses", form);
+        // await API.post("/expenses", form);
+         const res = await API.post("/expenses", form);
 
-        setMessage("✅ Expense Saved Successfully!");
+
+    // ✅ MESSAGE FROM API
+     const apiMessage = res.data.message;
+
+
+        // setMessage("✅ Expense Saved Successfully!");
+          setMessage(apiMessage);
+
 
         setTimeout(() => setMessage(""), 5000);
 
-        alert("Expense Saved Successfully!");
+        // alert("Expense Saved Successfully!");
+        alert(apiMessage);
 
-        // Optional: Reset instead of reload (better UX)
+       
         setForm({
            
             Type: "Expenses",
@@ -175,7 +197,7 @@ const handleDateChange = (e) => {
             Purpose: "",
             Branch: userbranch || ""
         });
-window.location.reload(); // Force reload to get new voucher number
+window.location.reload(); 
     } catch (err) {
         console.error(err);
         setMessage("❌ Error saving data");
@@ -189,7 +211,7 @@ window.location.reload(); // Force reload to get new voucher number
         <div className="container mt-5">
             <div className="card shadow-lg p-4 rounded-4">
 
-                <h3 className="text-center mb-4 text-primary">
+                <h3 className="text-center mb-4 text-black">
                       Cashbox Expense Entry
                   </h3>
 
@@ -202,13 +224,13 @@ window.location.reload(); // Force reload to get new voucher number
                 <div className="row g-3">
 
                   <div className="col-md-4">
-  <label>Voucher No</label>
-  <input
-    className="form-control"
-    value={form.VoucherNo}
-    readOnly
-  />
-</div>
+                        <label>Voucher No</label>
+                        <input
+                            className="form-control"
+                            value={form.VoucherNo}
+                            readOnly
+                        />
+                        </div>
 
                     <div className="col-md-6">
                         <label>Type</label>
@@ -220,10 +242,11 @@ window.location.reload(); // Force reload to get new voucher number
                     </div>
 
                     <div className="col-md-6">
-                        <label>Expense Category</label>
+                        <label>Category</label>
                         <select className="form-control" name="ExpenseCategory" onChange={handleChange}>
                             <option value="">Select</option>
-                            {categories.map(c => (
+                            {/* {categories.map(c => ( */}
+                            {filteredCategories.map(c => (
                                 <option key={c.Id} value={c.Id}>
                                     {c.ExpenseCategory}
                                 </option>
@@ -247,10 +270,7 @@ window.location.reload(); // Force reload to get new voucher number
 />
                     </div>
 
-                    {/* <div className="col-md-6">
-                        <label>Approved By</label>
-                        <input className="form-control" name="ApprovedBy" onChange={handleChange} />
-                    </div> */}
+                    
 
                     <div className="col-md-6">
                     <label>Approved By</label>
@@ -258,7 +278,7 @@ window.location.reload(); // Force reload to get new voucher number
                     <select
                         className="form-control"
                         name="ApprovedBy"
-                        value={form.ApprovedBy}   // ✅ bind state
+                        value={form.ApprovedBy}  
                         onChange={handleChange}
                     >
                         <option value="">Select Approver</option>
@@ -282,7 +302,8 @@ window.location.reload(); // Force reload to get new voucher number
 
                 <div className="text-center mt-4">
                     <button
-                        className="btn btn-success px-5 rounded-pill"
+                        className=" baseBgColor text-white px-5 py-2 rounded "
+                        style={{}}
                         onClick={handleSubmit}
                         disabled={loading}
                     >
