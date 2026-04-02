@@ -28,7 +28,7 @@ const VoucherDropdown = ({ setVoucher }) => {
   };
 
   return (
-    <div className="col-md-4">
+    <div className="col-md-4 w-100">
       <label>Voucher No</label>
 
       <Select
@@ -36,6 +36,7 @@ const VoucherDropdown = ({ setVoucher }) => {
         onChange={(selected) => setVoucher(selected.value)}
         placeholder="🔍 Search Voucher..."
         isSearchable
+        className=""
       />
     </div>
   );

@@ -105,106 +105,124 @@ const SuspenseReports = () => {
       </div>
 
       {/* TABLE */}
-      <div className="table-responsive">
-        <table className="table table-bordered table-striped text-center">
-          <thead className="table-dark">
-            <tr>
-              <th>Date</th>
-              <th>Branch</th>
-              <th>Voucher</th>
-              <th>Description</th>
-              <th>Adv Amount</th>
-              <th>Used Amount</th>
-              <th>Expense ID</th>
-              <th>Status</th>
-              <th>Approved</th>
+     <div
+  className="table-responsive"
+  style={{ maxHeight: "700px", overflowY: "auto" }}
+>
+  <table className="table table-bordered table-striped text-center">
 
-              {user.role === "999" && <th>Action</th>}
-              
-            </tr>
-          </thead>
-          <tbody>
-            {data.length > 0 ? (
-              data.map((row, i) => (
-                <tr key={i}>
-                  <td>{new Date(row.Date).toLocaleDateString()}</td>
-                  
-                  <td>{row.Branch}</td>
-                  <td>{row.VoucherNo}</td>                  
-                  <td>
-                    {editingRowId === row.Id ? (
-                      <select
-                        className="form-select form-select-sm"
-                        value={selectedCategoryId || ""}
-                        onChange={(e) => {
-                          const id = e.target.value;
+    {/* 🔥 Sticky Header */}
+    <thead
+      className="table-dark"
+      style={{ position: "sticky", top: 0, zIndex: 2 }}
+    >
+      <tr>
+        <th>Date</th>
+        <th>Branch</th>
+        <th>Voucher</th>
+        <th>Description</th>
+        <th>Adv Amount</th>
+        <th>Used Amount</th>
+        <th>Expense ID</th>
+        <th>Status</th>
+        <th>Approved</th>
+        {user.role === "999" && <th>Action</th>}
+      </tr>
+    </thead>
 
-                          const selected = categories.find(
-                            (c) => c.Id.toString() === id
-                          );
+    <tbody>
+      {data.length > 0 ? (
+        data.map((row, i) => (
+          <tr key={i}>
+            <td>{new Date(row.Date).toLocaleDateString()}</td>
+            <td>{row.Branch}</td>
+            <td>{row.VoucherNo}</td>
 
-                          setSelectedCategoryId(id); // ✅ ID
-                          setSelectedCategoryValue(selected?.ExpenseCategory || ""); // ✅ VALUE
-                        }}
-                      >
-                        <option value="">Select Category</option>
+            <td>
+              {editingRowId === row.Id ? (
+                <select
+                  className="form-select form-select-sm"
+                  value={selectedCategoryId || ""}
+                  onChange={(e) => {
+                    const id = e.target.value;
 
-                        {categories.map((c) => (
-                          <option key={c.Id} value={c.Id}>
-                            {c.ExpenseCategory}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <>
-                        <div>{row.Description}</div>
-                        <small className="text-muted">
-                          ({row.LedgerName})
-                        </small>
-                      </>
-                    )}
-                  </td>
-                  <td>₹ {row.AdvAmount}</td>
-                  <td>₹ {row.UsedAmount}</td>
-                  <td>{row.ExpenseID}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        row.Status.toLowerCase() === "completed"
-                          ? "bg-success"
-                          : "bg-warning"
-                      }`}
-                    >
-                      {row.Status.toLowerCase() === "completed" ? "Completed" : "Pending"}
-                    </span>
-                  </td>
-                  <td>{row.Approved || "-"}</td>
-                  { user.role === "999" && (
-                    <td>
-                      {editingRowId === row.Id ? (
-                        <button className="btn btn-sm btn-success" onClick={() => handleUpdateClick(row)}>
-                          Update
-                        </button>
-                      ) : (
-                        <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(row)}>
-                          Edit
-                        </button>
-                      )}
-                    </td>
-                  )}
-                  
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-muted py-4">
-                  No data found
-                </td>
-              </tr>
+                    const selected = categories.find(
+                      (c) => c.Id.toString() === id
+                    );
+
+                    setSelectedCategoryId(id);
+                    setSelectedCategoryValue(selected?.ExpenseCategory || "");
+                  }}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((c) => (
+                    <option key={c.Id} value={c.Id}>
+                      {c.ExpenseCategory}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <>
+                  <div>{row.Description}</div>
+                  <small className="text-muted">
+                    ({row.LedgerName})
+                  </small>
+                </>
+              )}
+            </td>
+
+            <td>₹ {row.AdvAmount}</td>
+            <td>₹ {row.UsedAmount}</td>
+            <td>{row.ExpenseID}</td>
+
+            <td>
+              <span
+                className={`badge ${
+                  row.Status.toLowerCase() === "completed"
+                    ? "bg-success"
+                    : "bg-warning"
+                }`}
+              >
+                {row.Status.toLowerCase() === "completed"
+                  ? "Completed"
+                  : "Pending"}
+              </span>
+            </td>
+
+            <td>{row.Approved || "-"}</td>
+
+            {user.role === "999" && (
+              <td>
+                {editingRowId === row.Id ? (
+                  <button
+                    className="btn btn-sm btn-success"
+                    onClick={() => handleUpdateClick(row)}
+                  >
+                    Update
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => handleEditClick(row)}
+                  >
+                    Edit
+                  </button>
+                )}
+              </td>
             )}
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="10" className="text-muted py-4">
+            No data found
+          </td>
+        </tr>
+      )}
+    </tbody>
+
+  </table>
+</div>
     </div>
   );
 };
