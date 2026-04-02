@@ -342,7 +342,7 @@ const InventoryDashboard = () => {
       {/* TABLE */}
       <div className="table-responsive">
         <table className="table table-bordered table-striped text-center">
-          <thead className="table-dark">
+          <thead className="table-primary text-white">
             <tr>
               <th>Date</th>
               <th>Branch</th>

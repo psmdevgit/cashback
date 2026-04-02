@@ -12,6 +12,7 @@ import SuspensesReport from "./pages/SuspenseReports";
 import MainLayout from "./components/MainLayout";
 import CashEntry from "./pages/CashEntry";
 import CashEntryReports from "./pages/CashEntryReports";
+import ExpenseReport from "./pages/ExpensesReport"; 
 
 function App() {
 
@@ -48,6 +49,7 @@ function App() {
           <Route path="entry" element={<Entry />} />
           <Route path="suspense" element={<SuspenseEntry />} />
           <Route path="suspensereports" element={<SuspensesReport />} />
+          <Route path="expensesreport" element={<ExpenseReport />} /> 
         </Route>
 
       </Routes>
