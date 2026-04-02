@@ -272,17 +272,17 @@ const exportToExcel = () => {
         style={{ maxHeight: "700px", overflowY: "auto" }} // set scrollable height
       >
         <table className="table table-bordered table-striped text-center mb-0">
-          <thead className="table-dark">
+          <thead className="table-primary">
             <tr>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Date</th>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Branch</th>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Voucher</th>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Type</th>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Description</th>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Amount</th>
-              <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Purpose</th>
+              <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Date</th>
+              <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Branch</th>
+              <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Voucher</th>
+              <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Type</th>
+              <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Description</th>
+              <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Amount</th>
+              <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Purpose</th>
               {user.role === "1" && (
-                <th style={{ position: "sticky", top: 0, background: "#212529", zIndex: 2 }}>Action</th>
+                <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Action</th>
               )}
             </tr>
           </thead>

@@ -184,7 +184,7 @@ const handleSubmit = async () => {
       {/* 🔹 GRID */}
       <div className="table-responsive">
         <table className="table table-bordered text-center">
-<thead className="table-dark">
+<thead className="table-primary">
   <tr>
     <th>ID</th>
     <th>Expense Category</th>

@@ -132,7 +132,7 @@ export default function CashEntry() {
 
                 <div className="table-responsive">
                   <table className="table table-bordered text-center align-middle">
-                    <thead className="table-dark">
+                    <thead className="table-primary">
                       <tr>
                         <th>Denomination</th>
                         <th>Count</th>

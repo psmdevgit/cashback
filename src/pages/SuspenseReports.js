@@ -1,6 +1,7 @@
-
 import React, { use, useEffect, useState } from "react";
 import API from "../axios";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const SuspenseReports = () => {
   const [data, setData] = useState([]);
@@ -18,30 +19,71 @@ const SuspenseReports = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(null); // new description
   const [selectedCategoryValue, setSelectedCategoryValue] = useState(null); // new description
 
+  const [statusFilter, setStatusFilter] = useState("completed"); // default
+
+
+  // useEffect(() => {
+  //   loadData();
+  //   fetchCategories();
+  // }, [branch, fromDate, toDate]);
+
   useEffect(() => {
-    loadData();
-    fetchCategories();
-  }, [branch, fromDate, toDate]);
+  loadData();
+  fetchCategories();
+}, [branch, fromDate, toDate, statusFilter]); // 👈 added statusFilter
+
+  // const loadData = async () => {
+  //   try {
+  //     const res = await API.get(`/allSuspenses?branch=${branch}&fromDate=${fromDate}&toDate=${toDate}`);
+  //     setData(res.data);
+
+  //     if (res.data.length > 0) {
+  //       const totalDebit = res.data.reduce((s, r) => s + Number(r.Debit), 0);
+  //       const totalCredit = res.data.reduce((s, r) => s + Number(r.Credit), 0);
+  //       setSummary({
+  //         opening: res.data[res.data.length - 1].OpeningBalance,
+  //         closing: res.data[0].ClosingBalance,
+  //         debit: totalDebit,
+  //         credit: totalCredit
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   const loadData = async () => {
-    try {
-      const res = await API.get(`/allSuspenses?branch=${branch}&fromDate=${fromDate}&toDate=${toDate}`);
-      setData(res.data);
+  try {
+    const res = await API.get(
+      `/allSuspenses?branch=${branch}&fromDate=${fromDate}&toDate=${toDate}`
+    );
 
-      if (res.data.length > 0) {
-        const totalDebit = res.data.reduce((s, r) => s + Number(r.Debit), 0);
-        const totalCredit = res.data.reduce((s, r) => s + Number(r.Credit), 0);
-        setSummary({
-          opening: res.data[res.data.length - 1].OpeningBalance,
-          closing: res.data[0].ClosingBalance,
-          debit: totalDebit,
-          credit: totalCredit
-        });
-      }
-    } catch (err) {
-      console.error(err);
+    const completedData = res.data.completed || [];
+    const pendingData = res.data.pending || [];
+
+    // 🔥 switch based on dropdown
+    const finalData =
+      statusFilter === "completed" ? completedData : pendingData;
+
+    setData(finalData);
+
+    if (finalData.length > 0) {
+      const totalDebit = finalData.reduce((s, r) => s + Number(r.Debit || 0), 0);
+      const totalCredit = finalData.reduce((s, r) => s + Number(r.Credit || 0), 0);
+
+      setSummary({
+        opening: finalData[finalData.length - 1]?.OpeningBalance || 0,
+        closing: finalData[0]?.ClosingBalance || 0,
+        debit: totalDebit,
+        credit: totalCredit,
+      });
+    } else {
+      setSummary({ opening: 0, closing: 0, debit: 0, credit: 0 });
     }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const fetchCategories = async () => {
     try {
@@ -75,6 +117,66 @@ const SuspenseReports = () => {
     }
   };
 
+const handleExport = () => {
+  if (data.length === 0) {
+    alert("No data to export");
+    return;
+  }
+
+  const exportData = data.map((row) => ({
+    Date: new Date(row.Date).toLocaleDateString(),
+    Branch: row.Branch,
+    Voucher: row.VoucherNo,
+    EmpID: row.EmpID,
+    Description: row.Description,
+    Ledger: row.LedgerName,
+    "Adv Amount": row.AdvAmount,
+    "Used Amount": row.UsedAmount,
+    Balance: row.Balance,
+    "Expense ID": row.ExpenseID,
+    Status: row.Status,
+    Approved: row.Approved || "-"
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  // ✅ Make header bold
+  const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col }); // first row
+    if (worksheet[cellAddress]) {
+      worksheet[cellAddress].s = {
+        font: { bold: true }
+      };
+    }
+  }
+
+  // Workbook
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+
+  // File name
+  const now = new Date();
+  const formattedDate = now.toISOString().replace(/[:.]/g, "-");
+
+  const fileName =
+    statusFilter === "completed"
+      ? `SuspenseCompletedReport_${formattedDate}.xlsx`
+      : `SuspensePendingReport_${formattedDate}.xlsx`;
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+    cellStyles: true // 🔥 important for styling
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: "application/octet-stream",
+  });
+
+  saveAs(blob, fileName);
+};
+
   return (
     <div className="container-fluid mt-3">
       <h3 className="text-center mb-4">Suspense Reports</h3>
@@ -82,7 +184,7 @@ const SuspenseReports = () => {
       {/* FILTER */}
       <div className="row mb-3 align-items-center">
         {userbranch === "HO" && (
-          <div className="col-md-3">
+          <div className="col-md-2">
             <select className="form-control" value={branch} onChange={(e) => setBranch(e.target.value)}>
               <option value="">ALL</option>
               <option value="CPT">CPT</option>
@@ -97,12 +199,32 @@ const SuspenseReports = () => {
           </div>
         )}
 
+        <div className="col-md-2">
+          <select
+            className="form-control"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+
         <div className="col-md-4 d-flex gap-2 align-items-center">
           <input type="date" className="form-control" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
           <span>To</span>
           <input type="date" className="form-control" value={toDate} onChange={(e) => setToDate(e.target.value)} />
         </div>
+
+      <div className="col-md-2">
+        <button className="btn btn-success btn-sm" onClick={handleExport}>
+          Export Excel
+        </button>
+      </div>        
+
       </div>
+
+
 
       {/* TABLE */}
      <div
@@ -113,16 +235,18 @@ const SuspenseReports = () => {
 
     {/* 🔥 Sticky Header */}
     <thead
-      className="table-dark"
+      className="table-primary"
       style={{ position: "sticky", top: 0, zIndex: 2 }}
     >
       <tr>
         <th>Date</th>
         <th>Branch</th>
         <th>Voucher</th>
+        <th>Emp ID</th>
         <th>Description</th>
         <th>Adv Amount</th>
         <th>Used Amount</th>
+        <th>Balance</th>
         <th>Expense ID</th>
         <th>Status</th>
         <th>Approved</th>
@@ -137,7 +261,7 @@ const SuspenseReports = () => {
             <td>{new Date(row.Date).toLocaleDateString()}</td>
             <td>{row.Branch}</td>
             <td>{row.VoucherNo}</td>
-
+            <td>{row.EmpID}</td>
             <td>
               {editingRowId === row.Id ? (
                 <select
@@ -173,6 +297,7 @@ const SuspenseReports = () => {
 
             <td>₹ {row.AdvAmount}</td>
             <td>₹ {row.UsedAmount}</td>
+            <td>₹ {row.Balance}</td>
             <td>{row.ExpenseID}</td>
 
             <td>
