@@ -148,7 +148,7 @@ const InventoryDashboard = () => {
       <div className="table-responsive">
         <table className="table table-bordered table-striped text-center">
 
-          <thead className="table-dark">
+          <thead className="table-primary">
             <tr>
               <th>Date</th>
               <th>Voucher</th>

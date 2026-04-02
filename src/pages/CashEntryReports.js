@@ -285,7 +285,7 @@ export default function Approval() {
 
     {/* 🔥 Sticky Header */}
     <thead
-      className="table-dark"
+      className="table-primary"
       style={{ position: "sticky", top: 0, zIndex: 2 }}
     >
       <tr>
