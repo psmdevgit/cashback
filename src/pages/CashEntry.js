@@ -37,9 +37,9 @@ export default function CashEntry() {
     denominations[50]*50 +
     denominations[20]*20 +
     denominations[10]*10 +
-    denominations.c10*10 +
-    denominations.c5*5 +
-    denominations.c2*2 +
+    // denominations.c10*10 +
+    // denominations.c5*5 +
+    // denominations.c2*2 +
     denominations.c1*1;
 
   const isBalanced = opening === (expenses + suspense + handCash);
@@ -56,14 +56,32 @@ export default function CashEntry() {
     });
 
     alert("✅ Submitted Successfully");
+
+     // 🔹 RESET STATES (LIKE PAGE RELOAD)
+    // setFromDate("");
+    // setToDate("");
+    // setExpenses(0);
+    // setSuspense(0);
+
+    // setDenominations({
+    //   500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0,
+    //   c10: 0, c5: 0, c2: 0, c1: 0
+    // });
+
+  // ⏳ Wait 1 second, then reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-3">
+
+
+        <h3 className="text-center mb-3">Cash Denomination</h3>
 
       {/* HEADER */}
-      <div className="card shadow p-4 mb-4">
-        <h3 className="text-center mb-3">💰 Pending Cash Entry</h3>
+      <div className="card shadow p-4 mb-3">
 
         <div className="row">
           <div className="col-md-6">
@@ -81,7 +99,7 @@ export default function CashEntry() {
       </div>
 
       {/* SUMMARY CARDS */}
-      <div className="row text-center mb-4">
+      <div className="row  text-center mb-4">
 
         <div className="col-md-4">
           <div className="card shadow p-3 bg-light">
@@ -106,83 +124,91 @@ export default function CashEntry() {
 
       </div>
 
-      {/* DENOMINATION TABLE */}
-      <div className="card shadow p-3">
-        <h5 className="mb-3">💵 Cash Denomination</h5>
+      <div className="row"> 
 
-        <div className="table-responsive">
-          <table className="table table-bordered text-center align-middle">
-            <thead className="table-dark">
-              <tr>
-                <th>Denomination</th>
-                <th>Count</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
+        {/* DENOMINATION TABLE */}
+              <div className="card col-lg-8  shadow p-3">
+                {/* <h5 className="mb-3">💵 Cash Denomination</h5> */}
 
-            <tbody>
-              {[500,200,100,50,20,10].map(d => (
-                <tr key={d}>
-                  <td>₹ {d}</td>
-                  <td>
-                    <input
-                      type="number"
-                      className="form-control text-center"
-                      onChange={e => setDenominations({
-                        ...denominations,
-                        [d]: Number(e.target.value)
-                      })}
-                    />
-                  </td>
-                  <td>₹ {denominations[d] * d}</td>
-                </tr>
-              ))}
+                <div className="table-responsive">
+                  <table className="table table-bordered text-center align-middle">
+                    <thead className="table-dark">
+                      <tr>
+                        <th>Denomination</th>
+                        <th>Count</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
 
-              {/* COINS */}
-              {[10,5,2,1].map(c => (
-                <tr key={"c"+c}>
-                  <td>₹ {c} (Coin)</td>
-                  <td>
-                    <input
-                      type="number"
-                      className="form-control text-center"
-                      onChange={e => setDenominations({
-                        ...denominations,
-                        ["c"+c]: Number(e.target.value)
-                      })}
-                    />
-                  </td>
-                  <td>₹ {denominations["c"+c] * c}</td>
-                </tr>
-              ))}
-            </tbody>
+                    <tbody>
+                      {[500,200,100,50,20,10].map(d => (
+                        <tr key={d}>
+                          <td>₹ {d}</td>
+                          <td>
+                            <input
+                              type="number"
+                              className="form-control text-center"
+                              onChange={e => setDenominations({
+                                ...denominations,
+                                [d]: Number(e.target.value)
+                              })}
+                            />
+                          </td>
+                          <td>₹ {denominations[d] * d}</td>
+                        </tr>
+                      ))}
 
-            {/* FOOTER */}
-            <tfoot>
-              <tr className="fw-bold">
-                <td colSpan="2">Total Hand Cash</td>
-                <td>₹ {handCash}</td>
-              </tr>
-            </tfoot>
+                      {/* COINS */}
+                      
+                      {/* {[10,5,2,1].map(c => ( */}
+                      {[1].map(c => (
+                        <tr key={"c"+c}>
+                          <td>₹ {c} (Coin)</td>
+                          <td>
+                            <input
+                              type="number"
+                              className="form-control text-center"
+                              onChange={e => setDenominations({
+                                ...denominations,
+                                ["c"+c]: Number(e.target.value)
+                              })}
+                            />
+                          </td>
+                          <td>₹ {denominations["c"+c] * c}</td>
+                        </tr>
+                      ))}
+                    </tbody>
 
-          </table>
-        </div>
+                    {/* FOOTER */}
+                    <tfoot>
+                      <tr className="fw-bold">
+                        <td colSpan="2">Total Hand Cash</td>
+                        <td>₹ {handCash}</td>
+                      </tr>
+                    </tfoot>
+
+                  </table>
+                </div>
+              </div>
+
+              {/* STATUS */}
+              <div className="text-center col-lg-4 mt-4">
+                <h4 className={isBalanced ? "text-success" : "text-danger"}>
+                  {isBalanced ? "✅ Balanced" : "❌ Not Matched"}
+                </h4>
+
+                <button
+                  className="btn btn-success px-5 mt-2"
+                  disabled={!isBalanced}
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </button>
+              </div>
+
       </div>
 
-      {/* STATUS */}
-      <div className="text-center mt-4">
-        <h4 className={isBalanced ? "text-success" : "text-danger"}>
-          {isBalanced ? "✅ Balanced" : "❌ Not Matched"}
-        </h4>
-
-        <button
-          className="btn btn-success px-5 mt-2"
-          disabled={!isBalanced}
-          onClick={handleSubmit}
-        >
-          Submit
-        </button>
-      </div>
+      
 
     </div>
   );
