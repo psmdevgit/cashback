@@ -1,93 +1,109 @@
-// import { NavLink } from "react-router-dom";
-// import '../App.css'
+
+
+// import { Link, useLocation } from "react-router-dom";
+// import "../App.css";
 // import logo from "../assets/pos.png";
 
 // function Sidebar({ isOpen, toggleSidebar }) {
+//   const location = useLocation(); 
+  
+//   const userbranch = localStorage.getItem("branch").trim();
+
 //   return (
 //     <div
 //       style={{
-//         display: isOpen ? "block" : "none", 
+//         display: isOpen ? "block" : "none",
 //         width: "250px",
 //         height: "100vh",
-//         background: "#2B7CD3",
+//         background:"#3F53B6",
 //         position: "fixed",
 //         top: 0,
 //         left: 0,
-//         zIndex: 1000
+//         zIndex: 1000,
 //       }}
-//       className="shadow"
+//       className="shadow sidebar"
 //     >
-      
-//       <div className="sidebar-header position-relative py-3">
+   
+//       <div className="sidebar-header position-relative pt-3">
+//         <div className="d-flex justify-content-center">
+//           <img src={logo} alt="Logo" className="sidebarLogo" />
+//         </div>
 
-//   <div className="d-flex justify-content-center">
-//     <img
-//       src={logo}
-//       alt="Logo"
-//       className="sidebarLogo"
-     
-//     />
-//   </div>
+//         <button
+//           className="btn d-lg-none position-absolute end-0 top-50 translate-middle-y me-2"
+//           onClick={toggleSidebar}
+//            style={{color:'#0F2470'}}
+//         >
+//           ✖
+//         </button>
+//       </div>
 
-//   <button
-//     className="btn text-white d-lg-none position-absolute end-0 top-50 translate-middle-y me-2"
-//     onClick={toggleSidebar}
-//   >
-//     ✖
-//   </button>
+//       {/* MENU */}
+//       <ul className="list-unstyled py-4 fw-bold text-black">
+// {/* 
+//         <li className={`py-2 px-3 ${location.pathname === "/inventory" ? "active-menu" : ""}`}>
+//           <Link to="/inventory" className="text-decoration-none link d-block">
+//             <i class="bi bi-cash-stack me-2"></i>
+//             Transactions
+//           </Link>
+//         </li> */}
 
-// </div>
-
-     
-//       <ul className="list-unstyled py-4 fw-bold text-white">
-//         <li className="py-2 px-4">
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/inventory"  className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Transactions</NavLink>
+//         <li className={`py-2 px-3 ${location.pathname === "/entry" ? "active-menu" : ""}`}>
+//           <Link to="/entry" className="text-decoration-none link  d-block">
+//             <i className="bi bi-pencil-square me-2"></i>
+//             Expenses
+//           </Link>
 //         </li>
 
-//         <li className="py-2 px-4">          
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/dailyTransaction"  className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Daily Transactions</NavLink>
+//         <li className={`py-2 px-3 ${location.pathname === "/suspense" ? "active-menu" : ""}`}>
+//           <Link to="/suspense" className="text-decoration-none link d-block">
+//             <i class="bi bi-pen me-2"></i>
+//             Suspense
+//           </Link>
 //         </li>
 
-//         <li className="py-2 px-4">          
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/cashentry"  className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Denomination</NavLink>
+//         <li className={`py-2 px-3 ${location.pathname === "/cashentry" ? "active-menu" : ""}`}>
+//           <Link to="/cashentry" className="text-decoration-none link d-block">
+//             <i class="bi bi-cash-coin me-2"></i>
+//             Denomination
+//           </Link>
 //         </li>
 
-//         <li className="py-2 px-4">
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/entry"  className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Expenses</NavLink>
+
+
+//         <li className={`py-2 px-3 ${location.pathname === "/dailyTransaction" ? "active-menu" : ""}`}>
+//           <Link to="/dailyTransaction" className="text-decoration-none link d-block">
+//             <i class="bi bi-wallet2 me-2"></i>
+//             Daily Transactions
+//           </Link>
 //         </li>
 
-//         <li className="py-2 px-4">
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/suspense" className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Suspense</NavLink>
+        
+
+        
+//         <li className={`py-2 px-3 ${location.pathname === "/cashreports" ? "active-menu" : ""}`}>
+//           <Link to="/cashreports" className="text-decoration-none link d-block">
+//            <i class="bi bi-file-bar-graph me-2"></i>
+//             Cash Reports
+//           </Link>
 //         </li>
 
-//         <li className="py-2 px-4">
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/cashreports"  className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Cash Reports</NavLink>
+//         <li className={`py-2 px-3  ${location.pathname === "/expensesreport" ? "active-menu" : ""}`}>                
+//           <Link to="/expensesreport" className="text-decoration-none link d-block">
+//           <i class="bi bi-file-earmark-check me-2"></i>
+//             Expense Reports
+//           </Link>
 //         </li>
 
-//         <li className="py-2 px-4">
-//           <i className="bi bi-pencil-square me-2"></i>
-//           <NavLink to="/suspensereports"  className={({ isActive }) => 
-//       `text-white text-decoration-none ${isActive ? "active-menu" : ""}`
-//     }>Suspense Reports</NavLink>
+//         <li className={`py-2 px-3 ${location.pathname === "/suspensereports" ? "active-menu" : ""}`}>
+//           <Link to="/suspensereports" className="text-decoration-none link d-block">
+//             <i class="bi bi-file-earmark-excel me-2"></i>
+//             Suspense Reports
+//           </Link>
 //         </li>
+
+        
+
 //       </ul>
 //     </div>
 //   );
@@ -95,12 +111,18 @@
 
 // export default Sidebar;
 
+
 import { Link, useLocation } from "react-router-dom";
 import "../App.css";
 import logo from "../assets/pos.png";
 
 function Sidebar({ isOpen, toggleSidebar }) {
-  const location = useLocation(); // ✅ get current path
+  const location = useLocation();
+  const userbranch = localStorage.getItem("branch").trim();
+  
+  const user = JSON.parse(localStorage.getItem("user") || "{}"); // parse user object
+
+  const role = user.role;
 
   return (
     <div
@@ -108,9 +130,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
         display: isOpen ? "block" : "none",
         width: "250px",
         height: "100vh",
-        // background: "#2B7CD3",
-        background:"#3F53B6",
-        // background:"#eee",
+        background: "#3F53B6",
         position: "fixed",
         top: 0,
         left: 0,
@@ -127,7 +147,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
         <button
           className="btn d-lg-none position-absolute end-0 top-50 translate-middle-y me-2"
           onClick={toggleSidebar}
-           style={{color:'#0F2470'}}
+          style={{ color: "#0F2470" }}
         >
           ✖
         </button>
@@ -135,62 +155,97 @@ function Sidebar({ isOpen, toggleSidebar }) {
 
       {/* MENU */}
       <ul className="list-unstyled py-4 fw-bold text-black">
+        {/* Hide for HO */}
+        {!["1", "2"].includes(role) && (
+          <>
+            <li
+              className={`py-2 px-3 ${
+                location.pathname === "/entry" ? "active-menu" : ""
+              }`}
+            >
+              <Link to="/entry" className="text-decoration-none link d-block">
+                <i className="bi bi-pencil-square me-2"></i>
+                Expenses
+              </Link>
+            </li>
 
-        <li className={`py-2 px-3 ${location.pathname === "/inventory" ? "active-menu" : ""}`}>
-          <Link to="/inventory" className="text-decoration-none link d-block">
-            <i className="bi bi-pencil-square me-2"></i>
-            Transactions
-          </Link>
-        </li>
+            <li
+              className={`py-2 px-3 ${
+                location.pathname === "/suspense" ? "active-menu" : ""
+              }`}
+            >
+              <Link to="/suspense" className="text-decoration-none link d-block">
+                <i className="bi bi-pen me-2"></i>
+                Suspense
+              </Link>
+            </li>
 
-        <li className={`py-2 px-3 ${location.pathname === "/dailyTransaction" ? "active-menu" : ""}`}>
-          <Link to="/dailyTransaction" className="text-decoration-none link d-block">
-            <i className="bi bi-pencil-square me-2"></i>
+            <li
+              className={`py-2 px-3 ${
+                location.pathname === "/cashentry" ? "active-menu" : ""
+              }`}
+            >
+              <Link to="/cashentry" className="text-decoration-none link d-block">
+                <i className="bi bi-cash-coin me-2"></i>
+                Denomination
+              </Link>
+            </li>
+          </>
+        )}
+
+        {/* Always visible */}
+        <li
+          className={`py-2 px-3 ${
+            location.pathname === "/dailyTransaction" ? "active-menu" : ""
+          }`}
+        >
+          <Link
+            to="/dailyTransaction"
+            className="text-decoration-none link d-block"
+          >
+            <i className="bi bi-wallet2 me-2"></i>
             Daily Transactions
           </Link>
         </li>
 
-        <li className={`py-2 px-3 ${location.pathname === "/cashentry" ? "active-menu" : ""}`}>
-          <Link to="/cashentry" className="text-decoration-none link d-block">
-            <i className="bi bi-pencil-square me-2"></i>
-            Denomination
-          </Link>
-        </li>
-
-        <li className={`py-2 px-3 ${location.pathname === "/entry" ? "active-menu" : ""}`}>
-          <Link to="/entry" className="text-decoration-none link  d-block">
-            <i className="bi bi-pencil-square me-2"></i>
-            Expenses
-          </Link>
-        </li>
-
-        <li className={`py-2 px-3 ${location.pathname === "/suspense" ? "active-menu" : ""}`}>
-          <Link to="/suspense" className="text-decoration-none link d-block">
-            <i className="bi bi-pencil-square me-2"></i>
-            Suspense
-          </Link>
-        </li>
-
-        <li className={`py-2 px-3 ${location.pathname === "/cashreports" ? "active-menu" : ""}`}>
+        <li
+          className={`py-2 px-3 ${
+            location.pathname === "/cashreports" ? "active-menu" : ""
+          }`}
+        >
           <Link to="/cashreports" className="text-decoration-none link d-block">
-            <i className="bi bi-pencil-square me-2"></i>
+            <i className="bi bi-file-bar-graph me-2"></i>
             Cash Reports
           </Link>
         </li>
 
-        <li className={`py-2 px-3 ${location.pathname === "/suspensereports" ? "active-menu" : ""}`}>
-          <Link to="/suspensereports" className="text-decoration-none link d-block">
-            <i className="bi bi-pencil-square me-2"></i>
-            Suspense Reports
-          </Link>
-        </li>
-          <li className="py-2 px-4">    
-      <i className="bi bi-file-text me-2"></i>
-          <Link to="/expensesreport" className="text-decoration-none text-white">
+        <li
+          className={`py-2 px-3 ${
+            location.pathname === "/expensesreport" ? "active-menu" : ""
+          }`}
+        >
+          <Link
+            to="/expensesreport"
+            className="text-decoration-none link d-block"
+          >
+            <i className="bi bi-file-earmark-check me-2"></i>
             Expense Reports
           </Link>
         </li>
 
+        <li
+          className={`py-2 px-3 ${
+            location.pathname === "/suspensereports" ? "active-menu" : ""
+          }`}
+        >
+          <Link
+            to="/suspensereports"
+            className="text-decoration-none link d-block"
+          >
+            <i className="bi bi-file-earmark-excel me-2"></i>
+            Suspense Reports
+          </Link>
+        </li>
       </ul>
     </div>
   );

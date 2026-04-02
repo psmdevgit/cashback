@@ -10,6 +10,9 @@ const SuspenseGrid = () => {
   const [message, setMessage] = useState("");
   const [categories, setCategories] = useState([]);
 
+  const [approvedBy, setApprovedBy] = useState("");
+  const [narration, setNarration] = useState("");
+
   
   //  const userBranch = localStorage.getItem("branch").trim(); 
 
@@ -103,50 +106,108 @@ useEffect(() => {
 }, [currentUsed, master.AdvanceAmount]);
 
   // 🔹 Submit
-const handleSubmit = async () => {
+// const handleSubmit = async () => {
 
-  const confirmSave = window.confirm("Are you sure you want to submit?");
+//   const confirmSave = window.confirm("Are you sure you want to submit?");
 
-  if (!confirmSave) return;
-    if (currentUsed > (master.AdvanceAmount || 0)) {
-    alert("❌ Current Entry exceeds Total Advance!");
-    return;
-  }
-
-
-  try {
-    const newRows = rows.filter(r => !r.saved);
-
-    const res = await API.post("/suspense/save", {
-      VoucherNo: voucher,
-      rows: newRows
-    });
-
-    const updated = rows.map(r => {
-      if (!r.saved) {
-        return {
-          ...r,
-          saved: true,
-          SuspenseId: res.data.ids.shift()
-        };
-      }
-      return r;
-    });
-
-    setRows(updated);
-    setMessage("✅ Saved Successfully");
-
-     // 🔥 wait 2 seconds → reload
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+//   if (!confirmSave) return;
+//     if (currentUsed > (master.AdvanceAmount || 0)) {
+//     alert("❌ Current Entry exceeds Total Advance!");
+//     return;
+//   }
 
 
-  } catch (err) {
-    alert(err.response?.data || "Error saving");
-  }
-};
-  
+//   try {
+//     const newRows = rows.filter(r => !r.saved);
+
+//     const res = await API.post("/suspense/save", {
+//       VoucherNo: voucher,
+//       rows: newRows
+//     });
+
+//     const updated = rows.map(r => {
+//       if (!r.saved) {
+//         return {
+//           ...r,
+//           saved: true,
+//           SuspenseId: res.data.ids.shift()
+//         };
+//       }
+//       return r;
+//     });
+
+//     setRows(updated);
+//     setMessage("✅ Saved Successfully");
+
+//      // 🔥 wait 2 seconds → reload
+//     setTimeout(() => {
+//       window.location.reload();
+//     }, 1000);
+
+
+//   } catch (err) {
+//     alert(err.response?.data || "Error saving");
+//   }
+// };
+        const handleSubmit = async () => {
+
+        if (!approvedBy) {
+          alert("❌ Please select Approved By!");
+          return;
+        }
+
+        //   if (!narration.trim()) {
+        //   alert("❌ Please enter narration!");
+        //   return;
+        // }
+
+        const confirmSave = window.confirm("Are you sure you want to submit?");
+        if (!confirmSave) return;
+
+        if (currentUsed > (master.AdvanceAmount || 0)) {
+          alert("❌ Current Entry exceeds Total Advance!");
+          return;
+        }
+
+        try {
+          const newRows = rows
+            .filter(r => !r.saved)
+            .map(r => ({
+              ...r,
+              ApprovedBy: approvedBy,
+              Narration: narration 
+            }));
+
+          const res = await API.post("/suspense/save", {
+            VoucherNo: voucher,
+             narration: narration,
+            rows: newRows
+          });
+
+          const updated = rows.map(r => {
+            if (!r.saved) {
+              return {
+                ...r,
+                saved: true,
+                ApprovedBy: approvedBy, 
+                Narration: narration,
+                SuspenseId: res.data.ids.shift()
+              };
+            }
+            return r;
+          });
+
+          setRows(updated);
+          setMessage("✅ Saved Successfully");
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+
+        } catch (err) {
+          alert(err.response?.data || "Error saving");
+        }
+      };
   return (
     <div className="container mt-3">
 
@@ -188,7 +249,7 @@ const handleSubmit = async () => {
   <tr>
     <th>ID</th>
     <th>Expense Category</th>
-    <th>Approved By</th>
+    {/* <th>Approved By</th> */}
     <th>Amount</th>
     <th>Action</th>
   </tr>
@@ -225,15 +286,8 @@ const handleSubmit = async () => {
       </td>
 
       {/* Approved */}
-      <td>
-        {/* <input
-          className="form-control"
-          value={row.ApprovedBy}
-          disabled={row.saved}
-          onChange={(e) =>
-            handleChange(i, "ApprovedBy", e.target.value)
-          }
-        /> */}
+      {/* <td>
+       
          <select
     className="form-control"
     value={row.ApprovedBy || ""}
@@ -248,7 +302,7 @@ const handleSubmit = async () => {
     <option value="GM/BM/SRM">GM/BM/SRM</option>
   </select>
   
-      </td>
+      </td> */}
 
       {/* Amount */}
       <td>
@@ -282,19 +336,19 @@ const handleSubmit = async () => {
           {/* 🔥 FOOTER */}
           <tfoot>
             <tr className="fw-bold">
-              <td colSpan="3">Already Used</td>
+              <td colSpan="2">Already Used</td>
               <td>{alreadyUsed}</td>
               <td></td>
             </tr>
 
             <tr className="fw-bold">
-              <td colSpan="3">Current Entry</td>
+              <td colSpan="2">Current Entry</td>
               <td>{currentUsed}</td>
               <td></td>
             </tr>
 
             <tr className="fw-bold">
-              <td colSpan="3">Remaining Balance</td>
+              <td colSpan="2">Remaining Balance</td>
               <td className={remaining < 0 ? "text-danger" : "text-success"}>
                 {remaining}
               </td>
@@ -305,19 +359,50 @@ const handleSubmit = async () => {
         </table>
       </div>
 
+      <div className="row">        
+
+        <div className="col-md-8">
+          {/* <label className="fw-bold">Narration</label> */}
+          <textarea
+            className="form-control"
+            rows="3"
+            placeholder="Enter narration..."
+            value={narration}
+            onChange={(e) => setNarration(e.target.value)}
+          ></textarea>
+        </div>
+
+        <div className="col-md-4">
+  
+              <select
+                className="form-control w-100"
+                value={approvedBy}
+                onChange={(e) => setApprovedBy(e.target.value)}
+              >
+                <option value="">Select Approver</option>
+                <option value="Director">Director</option>
+                <option value="VP/CFO">VP/CFO</option>
+                <option value="GM/BM/SRM">GM/BM/SRM</option>
+              </select>
+
+            </div>
+
+
+      </div>
       {/* 🔹 ACTION */}
-      <div className="d-flex justify-content-between mt-3">
-        <button className="btn btn-secondary" onClick={addRow}>
-          ➕ Add Row
+      <div className="d-flex justify-content-betwen gap-3 mt-3">        
+
+        <button className="btn btn-secondary btn-sm px-lg-4 rounded" onClick={addRow}>
+        Add Row
         </button>
 
-       <button
-  className="btn btn-success"
-  onClick={handleSubmit}
-  disabled={master.Status === "Completed"}
->
-  💾 Save
-</button>
+        <button
+          className="btn btn-success btn-sm px-lg-4 rounded"
+          onClick={handleSubmit}
+          disabled={master.Status === "Completed"}
+        >
+          Save
+        </button>
       </div>
 
       {message && (

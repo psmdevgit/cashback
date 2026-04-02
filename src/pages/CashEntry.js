@@ -12,6 +12,8 @@ export default function CashEntry() {
   const [expenses, setExpenses] = useState(0);
   const [suspense, setSuspense] = useState(0);
 
+  const [minDate, setMinDate] = useState("");
+
   const [denominations, setDenominations] = useState({
     500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0,
     c10: 0, c5: 0, c2: 0, c1: 0
@@ -29,6 +31,22 @@ export default function CashEntry() {
     }
   }, [fromDate, toDate, userbranch]);
 
+  useEffect(() => {
+  API.get("/last-entry-date", {
+    params: { branch: userbranch }
+  }).then(res => {
+    if (res.data.lastDate) {
+      const last = new Date(res.data.lastDate);
+
+      // 👉 Next day only allowed
+      last.setDate(last.getDate() + 1);
+
+      const formatted = last.toISOString().split("T")[0];
+      setMinDate(formatted);
+    }
+  });
+}, [userbranch]);
+
   // 🔹 Calculate Hand Cash
   const handCash =
     denominations[500]*500 +
@@ -43,6 +61,8 @@ export default function CashEntry() {
     denominations.c1*1;
 
   const isBalanced = opening === (expenses + suspense + handCash);
+  
+  const balance = opening - expenses - suspense;
 
   // 🔹 Submit
   const handleSubmit = async () => {
@@ -86,14 +106,32 @@ export default function CashEntry() {
         <div className="row">
           <div className="col-md-6">
             <label>From Date</label>
-            <input type="date" className="form-control"
-              onChange={e=>setFromDate(e.target.value)} />
+            {/* <input type="date" className="form-control"
+              onChange={e=>setFromDate(e.target.value)} /> */}
+
+              <input
+                type="date"
+                className="form-control"
+                min={minDate}
+                value={fromDate}
+                onChange={e => setFromDate(e.target.value)}
+              />
+
           </div>
 
           <div className="col-md-6">
             <label>To Date</label>
-            <input type="date" className="form-control"
-              onChange={e=>setToDate(e.target.value)} />
+            {/* <input type="date" className="form-control"
+              onChange={e=>setToDate(e.target.value)} /> */}
+
+              <input
+                type="date"
+                className="form-control"
+                min={fromDate || minDate}
+                value={toDate}
+                onChange={e => setToDate(e.target.value)}
+              />
+
           </div>
         </div>
       </div>
@@ -101,27 +139,34 @@ export default function CashEntry() {
       {/* SUMMARY CARDS */}
       <div className="row  text-center mb-4">
 
-        <div className="col-md-4">
+        <div className="col-md-3">
           <div className="card shadow p-3 bg-light">
             <h6>Opening</h6>
             <h4 className="text-primary">₹ {opening}</h4>
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-3">
           <div className="card shadow p-3 bg-light">
             <h6>Expenses</h6>
             <h4 className="text-danger">₹ {expenses}</h4>
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-3">
           <div className="card shadow p-3 bg-light">
             <h6>Suspense</h6>
             <h4 className="text-warning">₹ {suspense}</h4>
           </div>
         </div>
 
+        <div className="col-md-3">
+          <div className="card shadow p-3 bg-light">
+            <h6>Balance</h6>
+            <h4 className="text-success">₹ {balance}</h4>
+          </div>
+        </div>
+        
       </div>
 
       <div className="row"> 

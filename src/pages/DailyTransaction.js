@@ -11,6 +11,8 @@ const InventoryDashboard = () => {
   
   const user = JSON.parse(localStorage.getItem("user") || "{}"); // parse user object
 
+  const role = user.role;
+
   const [summary, setSummary] = useState({ opening: 0, closing: 0, debit: 0, credit: 0 });
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -21,6 +23,9 @@ const InventoryDashboard = () => {
   const [selectedCategoryValue, setSelectedCategoryValue] = useState(null); // new description
 
   const [typeFilter, setTypeFilter] = useState("");
+
+  const [editedAmount, setEditedAmount] = useState(null);
+  const [editedPurpose, setEditedPurpose] = useState(null);
 
 
   useEffect(() => {
@@ -60,6 +65,8 @@ const InventoryDashboard = () => {
   const handleEditClick = (row) => {
     setEditingRowId(row.Id);
     setSelectedCategoryId(row.DescriptionId || null); // assuming DescriptionId matches dropdown
+    setEditedAmount(row.Amount);
+    setEditedPurpose(row.Purpose);
   };
 
   const handleUpdateClick = async (row) => {
@@ -68,9 +75,22 @@ const InventoryDashboard = () => {
       return;
     }
 
+
+
+
     console.log("selected Row : ", row, selectedCategoryId, selectedCategoryValue, row.Description)
     try {
-      await API.post(`/updateDescription`, { VoucherNo: row.VoucherNo , DescriptionId: selectedCategoryId,DescriptionValue: selectedCategoryValue, existDescription:  row.Description , existLedgerName: row.LedgerName});
+      await API.post(`/updateDescription`, { 
+        VoucherNo: row.VoucherNo , 
+        DescriptionId: selectedCategoryId,
+        DescriptionValue: selectedCategoryValue, 
+        existDescription:  row.Description , 
+        existLedgerName: row.LedgerName,
+        newAmount: editedAmount,
+        newPurpose: editedPurpose, 
+        Amount: row.Amount,
+        Purpose: row.Purpose
+      });
       alert("Updated successfully!");
       setEditingRowId(null);
       loadData();
@@ -85,16 +105,40 @@ const InventoryDashboard = () => {
 });
 
 const exportToExcel = () => {
-  const exportData = filteredData.map((row) => ({
+  // const exportData = filteredData.map((row) => ({
+  //   Date: new Date(row.TranDate).toLocaleDateString(),
+  //   Branch: row.Branch,
+  //   VoucherNo: row.VoucherNo,
+  //   EmpID: row.EmpID,
+  //   Type: row.TranType,
+  //   Description: row.Description,
+  //   LedgerName: row.LedgerName,
+  //   Amount: row.Amount,
+  //   Purpose: row.Purpose,
+  // }));
+
+  const exportData = filteredData.map((row) => {
+  const baseData = {
     Date: new Date(row.TranDate).toLocaleDateString(),
-    Branch: row.Branch,
     VoucherNo: row.VoucherNo,
     Type: row.TranType,
     Description: row.Description,
     LedgerName: row.LedgerName,
     Amount: row.Amount,
-    Purpose: row.Purpose,
-  }));
+  };
+
+  // ✅ Only for role 1 & 2
+  if (["1", "2"].includes(role)) {
+    return {
+      ...baseData,
+      Branch: row.Branch,
+      EmpID: row.EmpID,
+      Purpose: row.Purpose,
+    };
+  }
+
+  return baseData;
+});
 
   const worksheet = XLSX.utils.json_to_sheet(exportData);
   const workbook = XLSX.utils.book_new();
@@ -109,7 +153,17 @@ const exportToExcel = () => {
     type: "application/octet-stream",
   });
 
-  saveAs(blob, "DailyTransactions.xlsx");
+  // saveAs(blob, "DailyTransactions.xlsx");
+    // ✅ Create DateTime filename
+  const now = new Date();
+  const formattedDate = now
+    .toISOString()
+    .replace(/[:.]/g, "-")   // remove invalid chars
+    .slice(0, 19);           // keep yyyy-mm-ddThh-mm-ss
+
+  const fileName = `DailyTransactions_${formattedDate}.xlsx`;
+
+  saveAs(blob, fileName);
 };
 
   return (
@@ -163,109 +217,6 @@ const exportToExcel = () => {
 
       
 
-
-      {/* TABLE */}
-      <div className="table-responsive">
-        <table className="table table-bordered table-striped text-center">
-          <thead className="table-primary text-white">
-            <tr>
-              <th>Date</th>
-              <th>Branch</th>
-              <th>Voucher</th>
-              <th>Type</th>
-              <th>Description</th>
-              <th>Amount</th>
-              <th>Purpose</th>
-
-              {user.role === "1" && <th>Action</th>}
-              
-            </tr>
-          </thead>
-          <tbody>
-            {data.length > 0 ? (
-              data.map((row, i) => (
-                <tr key={i}>
-                  <td>{new Date(row.TranDate).toLocaleDateString()}</td>
-                  
-                  <td>{row.Branch}</td>
-                  <td>{row.VoucherNo}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        row.TranType.toLowerCase() === "expenses"
-                          ? "bg-success"
-                          : row.TranType === "Suspenses"
-                          ? "bg-danger"
-                          : "bg-primary"
-                      }`}
-                    >
-                      {row.TranType}
-                    </span>
-                  </td>
-
-                  <td>
-                    {editingRowId === row.Id ? (
-                      <select
-                        className="form-select form-select-sm"
-                        value={selectedCategoryId || ""}
-                        onChange={(e) => {
-                          const id = e.target.value;
-
-                          const selected = categories.find(
-                            (c) => c.Id.toString() === id
-                          );
-
-                          setSelectedCategoryId(id); // ✅ ID
-                          setSelectedCategoryValue(selected?.ExpenseCategory || ""); // ✅ VALUE
-                        }}
-                      >
-                        <option value="">Select Category</option>
-
-                        {categories.map((c) => (
-                          <option key={c.Id} value={c.Id}>
-                            {c.ExpenseCategory}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <>
-                        <div>{row.Description}</div>
-                        <small className="text-muted">
-                          ({row.LedgerName})
-                        </small>
-                      </>
-                    )}
-                  </td>
-                  <td>₹ {row.Amount}</td>
-                  <td>{row.Purpose}</td>
-
-                  { user.role === "1" && (
-                    <td>
-                      {editingRowId === row.Id ? (
-                        <button className="btn btn-sm btn-success" onClick={() => handleUpdateClick(row)}>
-                          Update
-                        </button>
-                      ) : (
-                        <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(row)}>
-                          Edit
-                        </button>
-                      )}
-                    </td>
-                  )}
-                  
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-muted py-4">
-                  No data found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div> */}
-
       {/* TABLE */}
       <div
         className="table-responsive"
@@ -277,6 +228,7 @@ const exportToExcel = () => {
               <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Date</th>
               <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Branch</th>
               <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Voucher</th>
+              <th style={{ position: "sticky", top: 0, zIndex: 2 }}>EmpID</th>
               <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Type</th>
               <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Description</th>
               <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Amount</th>
@@ -293,6 +245,7 @@ const exportToExcel = () => {
                   <td>{new Date(row.TranDate).toLocaleDateString()}</td>
                   <td>{row.Branch}</td>
                   <td>{row.VoucherNo}</td>
+                  <td>{row.EmpID}</td>
                   <td>
                     <span
                       className={`badge ${
@@ -306,7 +259,7 @@ const exportToExcel = () => {
                       {row.TranType}
                     </span>
                   </td>
-                  <td>
+                  {/* <td>
                     {editingRowId === row.Id ? (
                       <select
                         className="form-select form-select-sm"
@@ -333,7 +286,60 @@ const exportToExcel = () => {
                     )}
                   </td>
                   <td>₹ {row.Amount}</td>
-                  <td>{row.Purpose}</td>
+                  <td>{row.Purpose}</td> */}
+
+                  <td>
+                      {editingRowId === row.Id ? (
+                        <select
+                          className="form-select form-select-sm"
+                          value={selectedCategoryId || ""}
+                          onChange={(e) => {
+                            const id = e.target.value;
+                            const selected = categories.find((c) => c.Id.toString() === id);
+                            setSelectedCategoryId(id);
+                            setSelectedCategoryValue(selected?.ExpenseCategory || "");
+                          }}
+                        >
+                          <option value="">Select Category</option>
+                          {categories.map((c) => (
+                            <option key={c.Id} value={c.Id}>
+                              {c.ExpenseCategory}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <>
+                          <div>{row.Description}</div>
+                          <small className="text-muted">({row.LedgerName})</small>
+                        </>
+                      )}
+                    </td>
+
+                    <td>
+                      {editingRowId === row.Id ? (
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          value={editedAmount || ""}
+                          onChange={(e) => setEditedAmount(e.target.value)}
+                        />
+                      ) : (
+                        `₹ ${row.Amount}`
+                      )}
+                    </td>
+
+                    <td>
+                      {editingRowId === row.Id ? (
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          value={editedPurpose || ""}
+                          onChange={(e) => setEditedPurpose(e.target.value)}
+                        />
+                      ) : (
+                        row.Purpose
+                      )}
+                    </td>
                   {user.role === "1" && (
                     <td>
                       {editingRowId === row.Id ? (
