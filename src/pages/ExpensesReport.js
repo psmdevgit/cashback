@@ -227,9 +227,8 @@ export default function ExpenseReport() {
     fromDate: "",
     toDate: "",
   });
-
   
-    const [branch, setBranch] = useState(userbranch === "HO" ? "" : userbranch);
+    // const [branch, setBranch] = useState(userbranch === "HO" ? "" : userbranch);
 
   useEffect(() => {
     fetchFilters();

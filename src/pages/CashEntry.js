@@ -31,7 +31,7 @@ export default function CashEntry() {
     }
   }, [fromDate, toDate, userbranch]);
 
-  useEffect(() => {
+useEffect(() => {
   API.get("/last-entry-date", {
     params: { branch: userbranch }
   }).then(res => {

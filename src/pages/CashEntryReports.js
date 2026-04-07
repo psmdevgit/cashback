@@ -371,7 +371,8 @@ export default function Approval() {
               </div>
 
               <div className="modal-body text-center">
-                Are you sure to approve as <strong>{selected.level}</strong>?
+                Are you sure to approve as <strong>{selected.level}</strong> 
+                ?
               </div>
 
               <div className="modal-footer justify-content-center">

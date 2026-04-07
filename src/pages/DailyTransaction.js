@@ -10,6 +10,7 @@ const InventoryDashboard = () => {
   const [branch, setBranch] = useState(userbranch === "HO" ? "" : userbranch);
   
   const user = JSON.parse(localStorage.getItem("user") || "{}"); // parse user object
+  
 
   const role = user.role;
 
@@ -233,7 +234,7 @@ const exportToExcel = () => {
               <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Description</th>
               <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Amount</th>
               <th style={{ position: "sticky", top: 0,  zIndex: 2 }}>Purpose</th>
-              {user.role === "1" && (
+              {user.role !== "2" && (
                 <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Action</th>
               )}
             </tr>
@@ -340,7 +341,7 @@ const exportToExcel = () => {
                         row.Purpose
                       )}
                     </td>
-                  {user.role === "1" && (
+                  {user.role !== "2" && (
                     <td>
                       {editingRowId === row.Id ? (
                         <button className="btn btn-sm btn-success" onClick={() => handleUpdateClick(row)}>
