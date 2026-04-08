@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import API from "../axios";
 import VoucherDropdown from "../components/VoucherDropDown";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SuspenseGrid = () => {
 
@@ -101,7 +103,8 @@ useEffect(() => {
 
     useEffect(() => {
   if (currentUsed > (master.AdvanceAmount || 0)) {
-    alert("❌ Current Entry exceeds Total Advance!");
+    // alert("❌ Current Entry exceeds Total Advance!");
+    toast.warning(" Current Entry exceeds Total Advance!");
   }
 }, [currentUsed, master.AdvanceAmount]);
 
@@ -152,7 +155,8 @@ useEffect(() => {
         const handleSubmit = async () => {
 
         if (!approvedBy) {
-          alert("❌ Please select Approved By!");
+          // alert("❌ Please select Approved By!");
+          toast.warning(" Please select Approved By!");
           return;
         }
 
@@ -161,11 +165,12 @@ useEffect(() => {
         //   return;
         // }
 
-        const confirmSave = window.confirm("Are you sure you want to submit?");
-        if (!confirmSave) return;
+        // const confirmSave = window.confirm("Are you sure you want to submit?");
+        // if (!confirmSave) return;
 
         if (currentUsed > (master.AdvanceAmount || 0)) {
-          alert("❌ Current Entry exceeds Total Advance!");
+          // alert("❌ Current Entry exceeds Total Advance!");
+          toast.warning("Current Entry exceeds Total Advance!");
           return;
         }
 
@@ -199,17 +204,21 @@ useEffect(() => {
 
           setRows(updated);
           setMessage("✅ Saved Successfully");
+          toast.success("Saved Successfully");
 
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
+          }, 2000);
 
         } catch (err) {
-          alert(err.response?.data || "Error saving");
+          // alert(err.response?.data || "Error saving");
+          toast.error(err.response?.data || "Error saving");
         }
       };
   return (
     <div className="container mt-3">
+
+      <ToastContainer position="top-right" autoClose={3000} />
 
       <h3 className="text-center mb-4">Suspense Entry</h3>
 

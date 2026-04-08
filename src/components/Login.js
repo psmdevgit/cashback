@@ -65,6 +65,46 @@ function Login() {
 //   }
 // }
 
+// async function handleLogin() {
+//   try {
+//     if (username === "") {
+//       setErrorMsg("Enter username");
+//       return;
+//     }
+
+//     if (password === "") {
+//       setErrorMsg("Enter password");
+//       return;
+//     }
+
+//     const response = await API.post("/login", {
+//       username: username,
+//       password: password,
+//     });
+
+//     const data = response.data; // ✅ Axios uses .data
+
+//     if (data.status === "success") {
+//       localStorage.setItem("user", JSON.stringify(data.data));
+
+//       const branchcode = data.data.branchCode.trim();
+//       localStorage.setItem("branch", branchcode);
+
+//       if (data.data.role === "1") {
+//         navigate("/dailyTransaction");
+//       } else {
+//         navigate("/dailyTransaction");
+//       }
+//     } else {
+//       setErrorMsg("Invalid username or password");
+//     }
+
+//   } catch (error) {
+//     console.error(error);
+//     setErrorMsg("Technical issue");
+//   }
+// }
+
 async function handleLogin() {
   try {
     if (username === "") {
@@ -82,7 +122,7 @@ async function handleLogin() {
       password: password,
     });
 
-    const data = response.data; // ✅ Axios uses .data
+    const data = response.data;
 
     if (data.status === "success") {
       localStorage.setItem("user", JSON.stringify(data.data));
@@ -90,20 +130,26 @@ async function handleLogin() {
       const branchcode = data.data.branchCode.trim();
       localStorage.setItem("branch", branchcode);
 
-      if (data.data.role === "1") {
-        navigate("/dailyTransaction");
-      } else {
-        navigate("/dailyTransaction");
-      }
+      navigate("/dailyTransaction");
+
     } else {
-      setErrorMsg("Invalid username or password");
+      // ✅ SHOW BACKEND MESSAGE
+      setErrorMsg(data.message);
     }
 
   } catch (error) {
     console.error(error);
-    setErrorMsg("Technical issue");
+
+    // ✅ SHOW SERVER ERROR MESSAGE
+    if (error.response) {
+      setErrorMsg(error.response.data.message);
+    } else {
+      setErrorMsg("Technical issue");
+    }
   }
 }
+
+
 
   return (
     <div className="loginmain d-flex justify-content-center align-items-center vh-100">

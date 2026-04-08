@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from "react";
 import API from "../axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CashEntry() {
 
-  const userbranch = localStorage.getItem("branch");
+  
+  const userbranch = localStorage.getItem("branch").trim();
 
+   const [branch, setBranch] = useState(
+      userbranch === "HO" ? "" : userbranch
+    );
+
+    const [summary, setSummary] = useState({
+        opening: 0,
+        closing: 0,
+        debit: 0,
+        credit: 0
+      });
+
+  // const [branchOpening, setBranchOpening] = useState([]);
+  const [branchOpening, setBranchOpening] = useState(0);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -19,6 +35,22 @@ export default function CashEntry() {
     c10: 0, c5: 0, c2: 0, c1: 0
   });
 
+useEffect(() => {
+  if (userbranch) {
+    API.get("/branch-opening", {
+      params: { branch: userbranch }
+    })
+    .then(res => {
+      console.log("opening : ",res.data.opening);
+      setBranchOpening(res.data.opening || 0);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+  }
+}, [userbranch]);
+
+
   // 🔹 Fetch Summary
   useEffect(() => {
     if (fromDate && toDate) {
@@ -31,7 +63,7 @@ export default function CashEntry() {
     }
   }, [fromDate, toDate, userbranch]);
 
-  useEffect(() => {
+useEffect(() => {
   API.get("/last-entry-date", {
     params: { branch: userbranch }
   }).then(res => {
@@ -60,43 +92,94 @@ export default function CashEntry() {
     // denominations.c2*2 +
     denominations.c1*1;
 
-  const isBalanced = opening === (expenses + suspense + handCash);
-  
-  const balance = opening - expenses - suspense;
+    const isBalanced = branchOpening === (expenses + suspense + handCash);
+    
+    const balance = branchOpening - expenses - suspense;
 
-  // 🔹 Submit
-  const handleSubmit = async () => {
-    if (!isBalanced) {
-      alert("❌ Amount not matched!");
-      return;
-    }
+    // 🔹 Submit
+  //   const handleSubmit = async () => {
+  //     if (!isBalanced) {
+  //       alert("❌ Amount not matched!");
+  //       return;
+  //     }
 
+  //   console.log("hand cash : ",handCash);
+
+  //   await API.post("/cash-entry", {
+  //     fromDate, toDate, opening, expenses, suspense, handCash, userbranch
+  //   });
+
+  //   alert("✅ Submitted Successfully");
+
+  //    // 🔹 RESET STATES (LIKE PAGE RELOAD)
+  //   // setFromDate("");
+  //   // setToDate("");
+  //   // setExpenses(0);
+  //   // setSuspense(0);
+
+  //   // setDenominations({
+  //   //   500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0,
+  //   //   c10: 0, c5: 0, c2: 0, c1: 0
+  //   // });
+
+  // // ⏳ Wait 1 second, then reload
+  //   setTimeout(() => {
+  //     window.location.reload();
+  //   }, 1000);
+  // };
+
+const handleSubmit = async () => {
+  if (!isBalanced) {
+    // alert("❌ Amount not matched!");
+    toast.error("❌ Amount not matched!");
+    return;
+  }
+
+  // 🔹 Convert denominations to array
+  const denominationArray = Object.keys(denominations).map(key => {
+    const count = denominations[key];
+    const value = key.startsWith("c") ? Number(key.slice(1)) : Number(key);
+
+    return {
+      denomination: value,
+      count
+    };
+  });
+
+  console.log("Denomination Array:", denominationArray);
+
+  try {
     await API.post("/cash-entry", {
-      fromDate, toDate, opening, expenses, suspense, handCash, userbranch
+      fromDate,
+      toDate,
+      opening,
+      expenses,
+      suspense,
+      handCash,
+      userbranch,
+      denominationArray
     });
 
-    alert("✅ Submitted Successfully");
+    // alert("✅ Submitted Successfully");
+    toast.success("Submitted Successfully");
 
-     // 🔹 RESET STATES (LIKE PAGE RELOAD)
-    // setFromDate("");
-    // setToDate("");
-    // setExpenses(0);
-    // setSuspense(0);
-
-    // setDenominations({
-    //   500: 0, 200: 0, 100: 0, 50: 0, 20: 0, 10: 0,
-    //   c10: 0, c5: 0, c2: 0, c1: 0
-    // });
-
-  // ⏳ Wait 1 second, then reload
     setTimeout(() => {
       window.location.reload();
-    }, 1000);
-  };
+    }, 2000);
+
+  } catch (err) {
+    console.error(err);
+    // alert("❌ Error saving data");
+      toast.error("❌ Error saving data");
+  }
+};
+
+
+ 
 
   return (
     <div className="container mt-3">
-
+<ToastContainer position="bottom-right" autoClose={2000} />
 
         <h3 className="text-center mb-3">Cash Denomination</h3>
 
@@ -142,7 +225,7 @@ export default function CashEntry() {
         <div className="col-md-3">
           <div className="card shadow p-3 bg-light">
             <h6>Opening</h6>
-            <h4 className="text-primary">₹ {opening}</h4>
+            <h4 className="text-primary">₹ {branchOpening}</h4>
           </div>
         </div>
 
@@ -208,7 +291,7 @@ export default function CashEntry() {
                       {/* {[10,5,2,1].map(c => ( */}
                       {[1].map(c => (
                         <tr key={"c"+c}>
-                          <td>₹ {c} (Coin)</td>
+                          <td>{c} (Coin)</td>
                           <td>
                             <input
                               type="number"
