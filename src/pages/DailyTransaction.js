@@ -3,6 +3,8 @@ import React, { use, useEffect, useState } from "react";
 import API from "../axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const InventoryDashboard = () => {
   const [data, setData] = useState([]);
@@ -17,6 +19,10 @@ const InventoryDashboard = () => {
   const [summary, setSummary] = useState({ opening: 0, closing: 0, debit: 0, credit: 0 });
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  
+     const [lastDate, setLastDate] = useState("No");
+
 
   const [categories, setCategories] = useState([]); // for dropdown
   const [editingRowId, setEditingRowId] = useState(null); // row being edited
@@ -39,6 +45,8 @@ const InventoryDashboard = () => {
       const res = await API.get(`/dailyTransactions?branch=${branch}&fromDate=${fromDate}&toDate=${toDate}`);
       setData(res.data);
 
+      console.log("date : ",res.data)
+
       if (res.data.length > 0) {
         const totalDebit = res.data.reduce((s, r) => s + Number(r.Debit), 0);
         const totalCredit = res.data.reduce((s, r) => s + Number(r.Credit), 0);
@@ -51,8 +59,39 @@ const InventoryDashboard = () => {
       }
     } catch (err) {
       console.error(err);
+      toast.error("Failed to load data");
     }
   };
+
+    useEffect(() => {
+    if (!branch) return;
+
+    API.get("/last-entry-date", {
+      params: { branch: branch }
+    })
+    
+      .then(res => {
+
+          console.log("response : ",res)
+        
+        let formatted = "";
+
+        if (res.data.lastDate) {
+          const last = new Date(res.data.lastDate);
+
+
+          // 👉 Allow only NEXT DAY
+          // last.setDate(last.getDate() + 1);
+
+          // formatted = last.toISOString().split("T")[0];
+          formatted = last.toLocaleDateString("en-CA");
+          setLastDate(formatted);
+
+        }     
+
+      })
+      .catch(err => console.log(err));
+  }, [branch]);
 
   const fetchCategories = async () => {
     try {
@@ -60,6 +99,7 @@ const InventoryDashboard = () => {
       setCategories(res.data);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to load categories");
     }
   };
 
@@ -72,7 +112,8 @@ const InventoryDashboard = () => {
 
   const handleUpdateClick = async (row) => {
     if (!selectedCategoryId) {
-      alert("Select a category first!");
+      // alert("Select a category first!");
+  toast.warning("Select a category first!");
       return;
     }
 
@@ -92,12 +133,14 @@ const InventoryDashboard = () => {
         Amount: row.Amount,
         Purpose: row.Purpose
       });
-      alert("Updated successfully!");
+      // alert("Updated successfully!");
+       toast.success("Updated successfully!");
       setEditingRowId(null);
       loadData();
     } catch (err) {
       console.error(err);
-      alert("Update failed!");
+      // alert("Update failed!");
+          toast.error("Update failed!");
     }
   };
 
@@ -165,10 +208,13 @@ const exportToExcel = () => {
   const fileName = `DailyTransactions_${formattedDate}.xlsx`;
 
   saveAs(blob, fileName);
+
+  toast.success("Excel exported successfully!");
 };
 
   return (
     <div className="container-fluid mt-3">
+      <ToastContainer position="top-right" autoClose={2000} />
       <h3 className="text-center mb-3">Daily Transactions</h3>
 
       {/* FILTER */}
@@ -342,17 +388,42 @@ const exportToExcel = () => {
                       )}
                     </td>
                   {user.role !== "2" && (
-                    <td>
-                      {editingRowId === row.Id ? (
-                        <button className="btn btn-sm btn-success" onClick={() => handleUpdateClick(row)}>
-                          Update
-                        </button>
-                      ) : (
-                        <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(row)}>
-                          Edit
-                        </button>
-                      )}
-                    </td>
+                    // <td>
+
+                    //     {editingRowId === row.Id ? (
+                    //     <button className="btn btn-sm btn-success" onClick={() => handleUpdateClick(row)}>
+                    //           Update
+                    //         </button>
+                    //       ) : (
+                    //         <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(row)}>
+                    //           Edit
+                    //         </button>
+                    //       )}
+                      
+                    // </td>
+
+                      <td>
+                        {user.role !== "2" && (() => {
+                          // parse dates
+                          const rowDate = new Date(row.TranDate);
+                          const minDate = new Date(lastDate); // lastDate is like "2026-04-07"
+
+                          // compare
+                          if (rowDate <= minDate) {
+                            return <label>Not Editable</label>;
+                          } else {
+                            return editingRowId === row.Id ? (
+                              <button className="btn btn-sm btn-success" onClick={() => handleUpdateClick(row)}>
+                                Update
+                              </button>
+                            ) : (
+                              <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(row)}>
+                                Edit
+                              </button>
+                            );
+                          }
+                        })()}
+                      </td>
                   )}
                 </tr>
               ))

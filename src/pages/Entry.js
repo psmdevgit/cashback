@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../style/Entry.css";
 import API from "../axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Entry = () => {
 
     
    const userbranch = localStorage.getItem("branch"); 
    const [filteredCategories, setFilteredCategories] = useState([]);
+
+   
 
    const [minDate, setMinDate] = useState("");
 
@@ -94,43 +98,97 @@ useEffect(() => {
     }
 }, []);
 
-useEffect(() => {
+// useEffect(() => {
+//   if (!userbranch) return;
+
+//   API.get("/last-entry-date", {
+//     params: { branch: userbranch }
+//   })
+  
+//     .then(res => {
+
+//         console.log("response : ",res)
+      
+//       let formatted = "";
+
+//       if (res.data.lastDate) {
+//         const last = new Date(res.data.lastDate);
+
+//         // 👉 Allow only NEXT DAY
+//         last.setDate(last.getDate() + 1);
+
+//         // formatted = last.toISOString().split("T")[0];
+//          formatted = last.toLocaleDateString("en-CA");
+//           setMinDate(formatted);
+
+//         // ✅ Auto set form date also
+//         setForm(prev => ({
+//           ...prev,
+//           Date: formatted
+//         }));
+
+//       }
+//       else{
+//         console.log("check")
+//          const today = new Date();
+//         formatted = today.toLocaleDateString("en-CA");
+//           setForm(prev => ({
+//           ...prev,
+//           Date: formatted
+//         }));
+//       }
+     
+
+//     })
+//     .catch(err => console.log(err));
+// }, [userbranch]);
+
+const fetchLastEntryDate = async () => {
   if (!userbranch) return;
 
-  API.get("/last-entry-date", {
-    params: { branch: userbranch }
-  })
-    .then(res => {
+  try {
+    const res = await API.get("/last-entry-date", {
+      params: { branch: userbranch }
+    });
 
+    console.log("response : ", res);
 
-      let formatted = "";
+    let formatted = "";
 
-      if (res.data.lastDate) {
-        const last = new Date(res.data.lastDate);
+    if (res.data.lastDate) {
+      const last = new Date(res.data.lastDate);
 
-        // 👉 Allow only NEXT DAY
-        last.setDate(last.getDate() + 1);
+      // 👉 Allow only NEXT DAY
+      last.setDate(last.getDate() + 1);
 
-        // formatted = last.toISOString().split("T")[0];
-         formatted = last.toLocaleDateString("en-CA");
+      formatted = last.toLocaleDateString("en-CA");
 
-      }
-      else{
-         const today = new Date();
-        formatted = today.toLocaleDateString("en-CA");
-      }
       setMinDate(formatted);
 
-        console.log("last",formatted)
+      setForm(prev => ({
+        ...prev,
+        Date: formatted
+      }));
 
-        // ✅ Auto set form date also
-        setForm(prev => ({
-          ...prev,
-          Date: formatted
-        }));
+    } else {
+      const today = new Date();
+      formatted = today.toLocaleDateString("en-CA");
 
-    })
-    .catch(err => console.log(err));
+      setMinDate(formatted); // ✅ also set minDate here
+
+      setForm(prev => ({
+        ...prev,
+        Date: formatted
+      }));
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+useEffect(() => {
+  fetchLastEntryDate();
 }, [userbranch]);
 
 const generateVoucher = async () => {
@@ -260,30 +318,36 @@ useEffect(() => {
 
         // setMessage("✅ Expense Saved Successfully!");
           setMessage(apiMessage);
-
-
-        setTimeout(() => setMessage(""), 5000);
+          toast.success(apiMessage);
 
         // alert("Expense Saved Successfully!");
-        alert(apiMessage);
+        // alert(apiMessage);
 
        
         setForm({
-           
+           VoucherNo: "",
             Type: "Expenses",
             ExpenseCategory: "",
             LedgerName: "",
             EmployeeCode: "",
-            Date: new Date().toISOString().split("T")[0],
+            Date: "", 
             ApprovedBy: "",
             Amount: "",
             Purpose: "",
-            Branch: userbranch || ""
-        });
-window.location.reload(); 
+            Branch: userbranch || ""             
+        }); 
+
+        generateVoucher();
+        fetchLastEntryDate();
+          // ✅ CLEAR MESSAGE + RELOAD AFTER 3 SEC
+        setTimeout(() => {
+            setMessage("");
+            window.location.reload();
+        }, 3000);
     } catch (err) {
         console.error(err);
         setMessage("❌ Error saving data");
+        toast.error("Error saving data");
     }
 
     setLoading(false);
@@ -292,6 +356,7 @@ window.location.reload();
     return (
       
         <div className="container mt-5">
+          <ToastContainer position="top-right" autoClose={2000} />
             <div className="card shadow-lg p-4 rounded-4">
 
                 <h3 className="text-center mb-4 text-black">

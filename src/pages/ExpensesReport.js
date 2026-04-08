@@ -221,8 +221,13 @@ export default function ExpenseReport() {
   const [branches, setBranches] = useState([]);
   const [categories, setCategories] = useState([]);
   const [totals, setTotals] = useState({});
+
+   const userbranch = localStorage.getItem("branch").trim();
+    const [branch, setBranch] = useState(
+       userbranch === "HO" ? "" : userbranch
+     );
   const [filters, setFilters] = useState({
-    branch: "",
+    branch: branch,
     category: "",
     fromDate: "",
     toDate: "",
@@ -242,8 +247,11 @@ export default function ExpenseReport() {
   };
 
   const fetchReport = async () => {
+    console.log('The filters',filters)
     const res = await API.post("/expense-report", filters);
-    const cleanedData = res.data.map((row) => {
+
+    console.log("data : ",res.data)
+    const cleanedData = res.data.map((row) => { 
       let newRow = {};
       Object.keys(row).forEach((key) => {
         newRow[key] = row[key] === null ? 0 : row[key];
@@ -321,20 +329,26 @@ export default function ExpenseReport() {
 
       {/* Filters */}
       <div className="row mb-3 g-2 align-items-center">
-        <div className="col-md-2">
-          <select
-            name="branch"
-            onChange={handleChange}
-            className="form-select form-select-sm"
-          >
-            <option value="">ALL</option>
-            {branches.map((b, i) => (
-              <option key={i} value={b}>
-                {b}
-              </option>
-            ))}
-          </select>
-        </div>
+
+        {
+          branch == 'ho' && (
+            <div className="col-md-2">
+              <select
+                name="branch"
+                onChange={handleChange}
+                className="form-select form-select-sm"
+              >
+                <option value="">ALL</option>
+                {branches.map((b, i) => (
+                  <option key={i} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )
+        }
+        
 
         <div className="col-md-2">
           <select
