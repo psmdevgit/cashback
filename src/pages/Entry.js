@@ -98,98 +98,52 @@ useEffect(() => {
     }
 }, []);
 
-// useEffect(() => {
-//   if (!userbranch) return;
-
-//   API.get("/last-entry-date", {
-//     params: { branch: userbranch }
-//   })
-  
-//     .then(res => {
-
-//         console.log("response : ",res)
-      
-//       let formatted = "";
-
-//       if (res.data.lastDate) {
-//         const last = new Date(res.data.lastDate);
-
-//         // 👉 Allow only NEXT DAY
-//         last.setDate(last.getDate() + 1);
-
-//         // formatted = last.toISOString().split("T")[0];
-//          formatted = last.toLocaleDateString("en-CA");
-//           setMinDate(formatted);
-
-//         // ✅ Auto set form date also
-//         setForm(prev => ({
-//           ...prev,
-//           Date: formatted
-//         }));
-
-//       }
-//       else{
-//         console.log("check")
-//          const today = new Date();
-//         formatted = today.toLocaleDateString("en-CA");
-//           setForm(prev => ({
-//           ...prev,
-//           Date: formatted
-//         }));
-//       }
-     
-
-//     })
-//     .catch(err => console.log(err));
-// }, [userbranch]);
-
-const fetchLastEntryDate = async () => {
+useEffect(() => {
   if (!userbranch) return;
 
-  try {
-    const res = await API.get("/last-entry-date", {
-      params: { branch: userbranch }
-    });
+  API.get("/last-entry-date", {
+    params: { branch: userbranch }
+  })
+  
+    .then(res => {
 
-    console.log("response : ", res);
+        console.log("response : ",res)
+      
+      let formatted = "";
 
-    let formatted = "";
+      if (res.data.lastDate) {
+        const last = new Date(res.data.lastDate);
 
-    if (res.data.lastDate) {
-      const last = new Date(res.data.lastDate);
+        // 👉 Allow only NEXT DAY
+        last.setDate(last.getDate() + 1);
 
-      // 👉 Allow only NEXT DAY
-      last.setDate(last.getDate() + 1);
+        // formatted = last.toISOString().split("T")[0];
+         formatted = last.toLocaleDateString("en-CA");
+          setMinDate(formatted);
 
-      formatted = last.toLocaleDateString("en-CA");
+        // ✅ Auto set form date also
+        setForm(prev => ({
+          ...prev,
+          Date: formatted
+        }));
 
-      setMinDate(formatted);
+      }
+      else{
+        console.log("check")
+         const today = new Date();
+        formatted = today.toLocaleDateString("en-CA");
+          setForm(prev => ({
+          ...prev,
+          Date: formatted
+        }));
+      }
+     
 
-      setForm(prev => ({
-        ...prev,
-        Date: formatted
-      }));
-
-    } else {
-      const today = new Date();
-      formatted = today.toLocaleDateString("en-CA");
-
-      setMinDate(formatted); // ✅ also set minDate here
-
-      setForm(prev => ({
-        ...prev,
-        Date: formatted
-      }));
-    }
-
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-useEffect(() => {
-  fetchLastEntryDate();
+    })
+    .catch(err => console.log(err));
 }, [userbranch]);
+
+
 
 const generateVoucher = async () => {
   try {
@@ -338,7 +292,6 @@ useEffect(() => {
         }); 
 
         generateVoucher();
-        fetchLastEntryDate();
           // ✅ CLEAR MESSAGE + RELOAD AFTER 3 SEC
         setTimeout(() => {
             setMessage("");
