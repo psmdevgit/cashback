@@ -420,7 +420,10 @@ export default function ExpenseReport() {
             {data.map((row, i) => (
               <tr key={i}>
                 {Object.values(row).map((val, j) => (
-                  <td key={j} className="border p-2 text-center">
+                  <td key={j} 
+                  // className="border p-2 text-center"
+                  className={`border p-2 ${j === 0 ? "text-start" : "text-center"}`}
+                  >
                     {val}
                   </td>
                 ))}

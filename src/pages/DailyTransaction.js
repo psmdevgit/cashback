@@ -133,8 +133,9 @@ const InventoryDashboard = () => {
         Amount: row.Amount,
         Purpose: row.Purpose
       });
+
       // alert("Updated successfully!");
-       toast.success("Updated successfully!");
+      toast.success("Updated successfully!");
       setEditingRowId(null);
       loadData();
     } catch (err) {
@@ -404,12 +405,22 @@ const exportToExcel = () => {
 
                       <td>
                         {user.role !== "2" && (() => {
+
+                          const formatDate = (d) =>
+                          new Date(d).toLocaleDateString("en-CA");
+                          const rowDate = formatDate(row.TranDate);
+                          const todayDate = formatDate(new Date());
+
                           // parse dates
-                          const rowDate = new Date(row.TranDate);
-                          const minDate = new Date(lastDate); // lastDate is like "2026-04-07"
+                          // const rowDate = new Date(row.TranDate);
+                          // const minDate = new Date(lastDate); // lastDate is like "2026-04-07"
+
+                          // const todayDate = new Date().toISOString().split("T")[0];
+
+                          console.log("t2 ", todayDate, rowDate)
 
                           // compare
-                          if (rowDate <= minDate) {
+                          if (rowDate !== todayDate) {
                             return <label>Not Editable</label>;
                           } else {
                             return editingRowId === row.Id ? (

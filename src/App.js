@@ -74,14 +74,14 @@ useEffect(() => {
           }
         >    
         
-          <Route path="inventory" element={<InventoryDashboard />} />
-          <Route path="dailyTransaction" element={<DailyTransaction/>} />
-          <Route path="cashentry" element={<CashEntry />} />
           <Route path="entry" element={<Entry />} />
           <Route path="suspense" element={<SuspenseEntry />} />
+          <Route path="cashentry" element={<CashEntry />} />
+          <Route path="dailyTransaction" element={<DailyTransaction/>} />
+          <Route path="inventory" element={<InventoryDashboard />} />
           <Route path="cashreports" element={<CashEntryReports />} />
-          <Route path="suspensereports" element={<SuspensesReport />} />
           <Route path="expensesreport" element={<ExpenseReport />} /> 
+          <Route path="suspensereports" element={<SuspensesReport />} />
         </Route>
 
       </Routes>
