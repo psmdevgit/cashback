@@ -210,6 +210,20 @@ function Sidebar({ isOpen, toggleSidebar }) {
 
         <li
           className={`py-2 px-3 ${
+            location.pathname === "/inventory" ? "active-menu" : ""
+          }`}
+        >
+          <Link
+            to="/inventory"
+            className="text-decoration-none link d-block"
+          >
+            <i className="bi bi-wallet2 me-2"></i>
+            Transaction Reports
+          </Link>
+        </li>
+
+        <li
+          className={`py-2 px-3 ${
             location.pathname === "/cashreports" ? "active-menu" : ""
           }`}
         >

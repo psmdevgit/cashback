@@ -197,6 +197,7 @@ export default function Approval() {
         <th>Opening</th>
         <th>Expenses</th>
         <th>Suspense</th>
+        <th>Receipt</th>
         <th>Hand Cash</th>
         <th>Status</th>
         {(user.role === '1' || user.role === '2') && <th>Action</th>}
@@ -214,6 +215,7 @@ export default function Approval() {
           <td>₹ {row.Opening}</td>
           <td className="text-danger">₹ {row.Expenses}</td>
           <td className="text-warning">₹ {row.Suspense}</td>
+          <td className="text-success">₹ {row.Receipt ? row.Receipt : 0}</td>
           <td className="fw-bold">₹ {row.HandCash}</td>
 
           <td>
@@ -259,9 +261,11 @@ export default function Approval() {
                 >
                   Approve L2
                 </button>
-              ) : (
-                <span className="badge bg-success text-white">Approved</span>
-              )}
+              ) : row.Status === "Pending L1" ? (
+                <span className="badge bg-primary text-white">Unpaid</span>
+              ) :
+              <span className="badge bg-success text-white">Paid</span>
+              }
 
               {loadingId === row.Id && (
                 <div className="spinner-border spinner-border-sm ms-2"></div>

@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 const SuspenseGrid = () => {
 
+  
+   const userbranch = localStorage.getItem("branch"); 
   const [voucher, setVoucher] = useState("");
   const [master, setMaster] = useState({});
   const [rows, setRows] = useState([]);
@@ -15,6 +17,56 @@ const SuspenseGrid = () => {
   const [approvedBy, setApprovedBy] = useState("");
   const [narration, setNarration] = useState("");
 
+  const [date, setDate] = useState("");
+
+  
+     const [minDate, setMinDate] = useState("");
+
+     useEffect(() => {
+  if (!userbranch) return;
+
+  API.get("/last-entry-date", {
+    params: { branch: userbranch }
+  })
+  
+    .then(res => {
+
+        console.log("response : ",res)
+      
+      let formatted = "";
+
+      if (res.data.lastDate) {
+        const last = new Date(res.data.lastDate);
+
+        // 👉 Allow only NEXT DAY
+        last.setDate(last.getDate() + 1);
+
+        // formatted = last.toISOString().split("T")[0];
+         formatted = last.toLocaleDateString("en-CA");
+          setMinDate(formatted);
+
+        // ✅ Auto set form date also
+        
+        
+         let today = new Date().toLocaleDateString("en-CA");
+       
+          setDate(today)
+        
+
+      }
+      else{
+        console.log("check")
+         const today = new Date();
+        formatted = today.toLocaleDateString("en-CA");
+                   
+          setDate(formatted)
+       
+      }
+     
+
+    })
+    .catch(err => console.log(err));
+}, [userbranch]);
   
   //  const userBranch = localStorage.getItem("branch").trim(); 
 
@@ -56,7 +108,21 @@ useEffect(() => {
     updated[index].ExpenseCategory = selected?.ExpenseCategory;
     updated[index].LedgerName = selected?.LedgerName;
     updated[index].CategoryId = value;
-  } else {
+  }
+   else if (field === "Amount") {
+    const amount = Number(value);
+
+    const categoryName = updated[index].ExpenseCategory;
+
+    // 🚨 Validation
+    if (categoryName && categoryName !== "Suspenses" && amount > 10000) {
+      toast.warning("Amount cannot exceed 10,000 for this category");
+      return; // ❌ stop update
+    }
+
+    updated[index].Amount = value;
+  } 
+   else {
     updated[index][field] = value;
   }
 
@@ -168,6 +234,15 @@ useEffect(() => {
         // const confirmSave = window.confirm("Are you sure you want to submit?");
         // if (!confirmSave) return;
 
+        // 🚨 Row-wise validation
+        for (let row of rows) {
+          if (row.ExpenseCategory !== "Suspense" && Number(row.Amount) > 10000) {
+            toast.error(`Row ${row.SuspenseId}: Amount cannot exceed 10,000`);
+            return;
+          }
+        }
+
+
         if (currentUsed > (master.AdvanceAmount || 0)) {
           // alert("❌ Current Entry exceeds Total Advance!");
           toast.warning("Current Entry exceeds Total Advance!");
@@ -183,6 +258,7 @@ useEffect(() => {
               Narration: narration 
             }));
 
+            
           const res = await API.post("/suspense/save", {
             VoucherNo: voucher,
              narration: narration,
@@ -394,14 +470,28 @@ useEffect(() => {
                 <option value="GM/BM/SRM">GM/BM/SRM</option>
               </select>
 
-            </div>
+              {/* <div className="mt-2 d-flex align-items-center justify-content-center gap-3 ">
+                    <label>Used Date : </label>
+                    <input
+                        type="date"
+                        className="form-control w-75"
+                        name="Date"
+                        value={date}
+                        min={minDate}   // ✅ restrict past dates
+                        onChange={(e) => setDate(e.target.value)}
+                        />
+
+              </div> */}
+
+        </div>
+
 
 
       </div>
       {/* 🔹 ACTION */}
       <div className="d-flex justify-content-betwen gap-3 mt-3">        
 
-        <button className="btn btn-secondary btn-sm px-lg-4 rounded" onClick={addRow}>
+        <button className="btn btn-secondary btn-sm px-lg-4 rounded" onClick={addRow} disabled={!voucher}>
         Add Row
         </button>
 

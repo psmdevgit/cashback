@@ -4,6 +4,7 @@ import "../style/Entry.css";
 import API from "../axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { type } from "@testing-library/user-event/dist/type";
 
 const Entry = () => {
 
@@ -13,7 +14,7 @@ const Entry = () => {
 
    
 
-   const [minDate, setMinDate] = useState("");
+  //  const [minDate, setMinDate] = useState("");
 
     const today = new Date().toISOString().split("T")[0];
 const [form, setForm] = useState({
@@ -22,7 +23,7 @@ const [form, setForm] = useState({
     ExpenseCategory: "",
     LedgerName: "",
     EmployeeCode: "",
-    Date: "", 
+    Date: today, 
     ApprovedBy: "",
     Amount: "",
     Purpose: "",
@@ -45,6 +46,9 @@ const getFormType = (type) => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
+    
+    const [balance, setBalance] = useState(0);
+
     // Voucher Load
 //  useEffect(() => {
 //     API.get("/voucher")
@@ -57,16 +61,54 @@ const getFormType = (type) => {
 //         });
 // }, []);
 
+// useEffect(() => {
+//   if (form.Type === "Suspenses") {
+
+//     const filtered = categories.filter(
+//       (c) => c.ExpenseCategory?.toLowerCase().includes("suspense")
+//     );
+
+//     setFilteredCategories(filtered);
+
+//     // 🔥 AUTO SELECT FIRST SUSPENSE CATEGORY
+//     if (filtered.length > 0) {
+//       const first = filtered[0];
+
+//       setForm(prev => ({
+//         ...prev,
+//         ExpenseCategory: first.ExpenseCategory,
+//         LedgerName: first.LedgerName
+//       }));
+//     }
+
+//   } else {
+//     setFilteredCategories(categories);
+
+//     // 🔄 Reset category when not suspense
+//     setForm(prev => ({
+//       ...prev,
+//       ExpenseCategory: "",
+//       LedgerName: ""
+//     }));
+//   }
+// }, [form.Type, categories]);
+
+
 useEffect(() => {
+
+  // SUSPENSE ONLY
   if (form.Type === "Suspenses") {
 
     const filtered = categories.filter(
-      (c) => c.ExpenseCategory?.toLowerCase().includes("suspense")
+      (c) =>
+        c.ExpenseCategory
+          ?.toLowerCase()
+          .includes("suspense")
     );
 
     setFilteredCategories(filtered);
 
-    // 🔥 AUTO SELECT FIRST SUSPENSE CATEGORY
+    // AUTO SELECT FIRST
     if (filtered.length > 0) {
       const first = filtered[0];
 
@@ -77,16 +119,56 @@ useEffect(() => {
       }));
     }
 
-  } else {
-    setFilteredCategories(categories);
+  }
 
-    // 🔄 Reset category when not suspense
+  // EXPENSES
+  else if (form.Type === "Expenses") {
+
+    const filtered = categories.filter(
+      (c) => {
+        const name =
+          c.ExpenseCategory?.toLowerCase() || "";
+
+        return (
+          !name.includes("suspenses") &&
+          !name.includes("receipt")
+        );
+      }
+    );
+
+    setFilteredCategories(filtered);
+
     setForm(prev => ({
       ...prev,
       ExpenseCategory: "",
       LedgerName: ""
     }));
   }
+
+  // RECEIPT
+  else if (form.Type === "Receipt") {
+
+    const filtered = categories.filter(
+      (c) => {
+        const name =
+          c.ExpenseCategory?.toLowerCase() || "";
+
+        return (
+          !name.includes("suspenses")&&
+          !name.includes("receipt")
+        );
+      }
+    );
+
+    setFilteredCategories(filtered);
+
+    setForm(prev => ({
+      ...prev,
+      ExpenseCategory: "",
+      LedgerName: ""
+    }));
+  }
+
 }, [form.Type, categories]);
 
 useEffect(() => {
@@ -98,50 +180,50 @@ useEffect(() => {
     }
 }, []);
 
-useEffect(() => {
-  if (!userbranch) return;
+// useEffect(() => {
+//   if (!userbranch) return;
 
-  API.get("/last-entry-date", {
-    params: { branch: userbranch }
-  })
+//   API.get("/last-entry-date", {
+//     params: { branch: userbranch }
+//   })
   
-    .then(res => {
+//     .then(res => {
 
-        console.log("response : ",res)
+//         console.log("response : ",res)
       
-      let formatted = "";
+//       let formatted = "";
 
-      if (res.data.lastDate) {
-        const last = new Date(res.data.lastDate);
+//       if (res.data.lastDate) {
+//         const last = new Date(res.data.lastDate);
 
-        // 👉 Allow only NEXT DAY
-        last.setDate(last.getDate() + 1);
+//         // 👉 Allow only NEXT DAY
+//         last.setDate(last.getDate() + 1);
 
-        // formatted = last.toISOString().split("T")[0];
-         formatted = last.toLocaleDateString("en-CA");
-          setMinDate(formatted);
+//         // formatted = last.toISOString().split("T")[0];
+//          formatted = last.toLocaleDateString("en-CA");
+//           setMinDate(formatted);
 
-        // ✅ Auto set form date also
-        setForm(prev => ({
-          ...prev,
-          Date: formatted
-        }));
+//         // ✅ Auto set form date also
+//         setForm(prev => ({
+//           ...prev,
+//           Date: formatted
+//         }));
 
-      }
-      else{
-        console.log("check")
-         const today = new Date();
-        formatted = today.toLocaleDateString("en-CA");
-          setForm(prev => ({
-          ...prev,
-          Date: formatted
-        }));
-      }
+//       }
+//       else{
+//         console.log("check")
+//          const today = new Date();
+//         formatted = today.toLocaleDateString("en-CA");
+//           setForm(prev => ({
+//           ...prev,
+//           Date: formatted
+//         }));
+//       }
      
 
-    })
-    .catch(err => console.log(err));
-}, [userbranch]);
+//     })
+//     .catch(err => console.log(err));
+// }, [userbranch]);
 
 
 
@@ -186,6 +268,25 @@ const handleDateChange = (e) => {
     }));
 };
 
+useEffect(() => {
+  const branch = localStorage.getItem("branch");
+
+  API.get("/last-balance-amount", {
+    params: { branch }   // ✅ pass branch here
+  })
+    .then(res => {
+    //   console.log("API Response:", res.data);
+      console.log("Balance:", res.data.balance);
+
+      setBalance(res.data.balance);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+    });
+}, []);
+
+
+
 //  useEffect(() => {
 //     API.get("/voucher")
 //         .then(res => {
@@ -216,16 +317,16 @@ const handleDateChange = (e) => {
     }
 };
 
-useEffect(() => {
-  if (form.Type === "Suspenses") {
-    const filtered = categories.filter(
-      (c) => c.ExpenseCategory?.toLowerCase().includes("suspense")
-    );
-    setFilteredCategories(filtered);
-  } else {
-    setFilteredCategories(categories); // show all
-  }
-}, [form.Type, categories]);
+// useEffect(() => {
+//   if (form.Type === "Suspenses") {
+//     const filtered = categories.filter(
+//       (c) => c.ExpenseCategory?.toLowerCase().includes("suspense")
+//     );
+//     setFilteredCategories(filtered);
+//   } else {
+//     setFilteredCategories(categories); // show all
+//   }
+// }, [form.Type, categories]);
 
   const handleSubmit = async () => {
 
@@ -239,7 +340,6 @@ useEffect(() => {
         !form.Amount ||
         !form.Purpose   ||
         !form.Branch
-
     ) {
         setMessage("⚠️ All fields are mandatory!");
         return;
@@ -257,9 +357,34 @@ useEffect(() => {
         }
     }
 
+    if (form.EmployeeCode) {
+    const code = form.EmployeeCode.trim();
+
+    // ❌ block 0, 00, 000...
+    if (/^0+$/.test(code)) {
+        setMessage("⚠️ Employee or PAS Code cannot be 0");
+        return;
+    }
+
+    // ❌ block comma
+    if (code.includes(",")) {
+        setMessage("⚠️ Employee Code should not contain comma");
+        return;
+    }
+    }
+
+    const amount = Number(form.Amount);
+    const type = form.Type?.toLowerCase();
+
+    if (type !== "receipt" && amount > Number(balance)) {
+        setMessage("Your balance amount is now lower, ask PAS Amount");
+        return;
+    }
+
     setLoading(true);
     
-    console.log(form)
+    // console.log(form);
+    //   return;
 
     try {
         // await API.post("/expenses", form);
@@ -373,7 +498,7 @@ useEffect(() => {
                     </div>
 
                     <div className="col-md-6">
-                        <label>Employee Code</label>
+                        <label>Employee / PAS Code</label>
                         <input className="form-control" name="EmployeeCode" onChange={handleChange} />
                     </div>
 
@@ -391,8 +516,10 @@ useEffect(() => {
                         type="date"
                         className="form-control"
                         name="Date"
+                        disabled
                         value={form.Date}
-                        min={minDate}   // ✅ restrict past dates
+                        readOnly
+                        // min={minDate}  
                         onChange={handleDateChange}
                         />
 

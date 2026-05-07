@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import API from "../axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRef } from "react";
+import html2canvas from "html2canvas";
+
 
 export default function CashEntry() {
 
   
-  const userbranch = localStorage.getItem("branch").trim();
+  const userbranch = localStorage.getItem("branch").trim();  
+  const pageRef = useRef();
 
    const [branch, setBranch] = useState(
       userbranch === "HO" ? "" : userbranch
@@ -24,9 +28,10 @@ export default function CashEntry() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const [opening] = useState(100000);
+  const [opening, setOpening] = useState(0);
   const [expenses, setExpenses] = useState(0);
   const [suspense, setSuspense] = useState(0);
+  const [receipt, setReceipt] = useState(0);
 
   const [minDate, setMinDate] = useState("");
 
@@ -35,20 +40,37 @@ export default function CashEntry() {
     c10: 0, c5: 0, c2: 0, c1: 0
   });
 
+// useEffect(() => {
+//   if (userbranch) {
+//     API.get("/branch-opening", {
+//       params: { branch: userbranch }
+//     })
+//     .then(res => {
+//       console.log("opening : ",res.data.opening);
+//       setBranchOpening(res.data.opening || 0);
+//     })
+//     .catch(err => {
+//       console.log(err);
+//     });
+//   }
+// }, [userbranch]);
+
 useEffect(() => {
   if (userbranch) {
     API.get("/branch-opening", {
-      params: { branch: userbranch }
+      params: { branch: userbranch, fromDate: fromDate, toDate: toDate  }
     })
     .then(res => {
       console.log("opening : ",res.data.opening);
       setBranchOpening(res.data.opening || 0);
+      setOpening(res.data.opening || 0)
     })
     .catch(err => {
       console.log(err);
     });
   }
-}, [userbranch]);
+}, [userbranch, fromDate, toDate]);
+
 
 
   // 🔹 Fetch Summary
@@ -59,6 +81,7 @@ useEffect(() => {
       }).then(res => {
         setExpenses(res.data.expenses || 0);
         setSuspense(res.data.suspense || 0);
+        setReceipt(res.data.receipt || 0);
       });
     }
   }, [fromDate, toDate, userbranch]);
@@ -92,9 +115,10 @@ useEffect(() => {
     // denominations.c2*2 +
     denominations.c1*1;
 
-    const isBalanced = branchOpening === (expenses + suspense + handCash);
+    const isBalanced = branchOpening === (expenses + suspense + handCash - receipt);
+    const difference = isBalanced - handCash;
     
-    const balance = branchOpening - expenses - suspense;
+    const balance = branchOpening - expenses - suspense + receipt;
 
     // 🔹 Submit
   //   const handleSubmit = async () => {
@@ -129,8 +153,16 @@ useEffect(() => {
   // };
 
 const handleSubmit = async () => {
+  
+  console.log(expenses + suspense + handCash + receipt);
+    console.log("balanse :",isBalanced);
+
+    if(!fromDate || !toDate ){
+        toast.error("select From / To Date");
+        return;
+    }
+
   if (!isBalanced) {
-    // alert("❌ Amount not matched!");
     toast.error("❌ Amount not matched!");
     return;
   }
@@ -155,6 +187,7 @@ const handleSubmit = async () => {
       opening,
       expenses,
       suspense,
+      receipt,
       handCash,
       userbranch,
       denominationArray
@@ -162,6 +195,8 @@ const handleSubmit = async () => {
 
     // alert("✅ Submitted Successfully");
     toast.success("Submitted Successfully");
+    
+    await downloadImage();
 
     setTimeout(() => {
       window.location.reload();
@@ -174,10 +209,51 @@ const handleSubmit = async () => {
   }
 };
 
+const formatDateImage = (dateStr) => {
+  if (!dateStr) return "";
 
- 
+  const date = new Date(dateStr);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = date.toLocaleString("en-IN", { month: "short" }); 
+  // e.g. Jan, Feb, Mar
+
+  return `${day}${month}`;
+};
+
+
+
+    const downloadImage = async () => {
+      if (!pageRef.current) return;
+
+      // 🔴 Hide elements before capture
+      const noPrintElements = document.querySelectorAll(".no-print");
+      noPrintElements.forEach(el => el.style.display = "none");
+
+      const canvas = await html2canvas(pageRef.current, {
+        scale: 2,
+        useCORS: true
+      });
+
+      const image = canvas.toDataURL("image/png");
+       // ✅ Format filename
+      const from = formatDateImage(fromDate);
+      const to = formatDateImage(toDate);
+
+      const fileName = `Denomination_${from}-${to}.png`;
+
+
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = fileName;
+      link.click();
+
+      noPrintElements.forEach(el => el.style.display = "");
+    };
 
   return (
+
+    <div ref={pageRef}>
     <div className="container mt-3">
 <ToastContainer position="bottom-right" autoClose={2000} />
 
@@ -222,28 +298,35 @@ const handleSubmit = async () => {
       {/* SUMMARY CARDS */}
       <div className="row  text-center mb-4">
 
-        <div className="col-md-3">
+        <div className="col-md-2">
           <div className="card shadow p-3 bg-light">
             <h6>Opening</h6>
             <h4 className="text-primary">₹ {branchOpening}</h4>
           </div>
         </div>
 
-        <div className="col-md-3">
+        <div className="col-md-2">
           <div className="card shadow p-3 bg-light">
             <h6>Expenses</h6>
             <h4 className="text-danger">₹ {expenses}</h4>
           </div>
         </div>
 
-        <div className="col-md-3">
+        <div className="col-md-2">
           <div className="card shadow p-3 bg-light">
             <h6>Suspense</h6>
             <h4 className="text-warning">₹ {suspense}</h4>
           </div>
         </div>
 
-        <div className="col-md-3">
+        <div className="col-md-2">
+          <div className="card shadow p-3 bg-light">
+            <h6>Receipt</h6>
+            <h4 className="text-secondary">₹ {receipt}</h4>
+          </div>
+        </div>
+
+        <div className="col-md-2">
           <div className="card shadow p-3 bg-light">
             <h6>Balance</h6>
             <h4 className="text-success">₹ {balance}</h4>
@@ -320,14 +403,15 @@ const handleSubmit = async () => {
               </div>
 
               {/* STATUS */}
-              <div className="text-center col-lg-4 mt-4">
+              <div className="text-center col-lg-4 mt-4 no-print">
                 <h4 className={isBalanced ? "text-success" : "text-danger"}>
-                  {isBalanced ? "✅ Balanced" : "❌ Not Matched"}
+                  {
+                  isBalanced ? "✅ Balanced" : "❌ Not Matched"}
                 </h4>
 
                 <button
                   className="btn btn-success px-5 mt-2"
-                  disabled={!isBalanced}
+                  disabled={difference == 0 || !isBalanced}
                   onClick={handleSubmit}
                 >
                   Submit
@@ -338,6 +422,7 @@ const handleSubmit = async () => {
 
       
 
+    </div>
     </div>
   );
 }
